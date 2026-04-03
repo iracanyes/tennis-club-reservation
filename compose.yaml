@@ -1,0 +1,62 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+services:
+#  server:
+#    build:
+#      context: backend
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#    environment:
+#      DJANGO_SETTINGS_MODULE: tcr_backend.config.settings.production
+#      DB_HOST: db
+#      DB_PORT: 5432
+#    secrets:
+#      - django_secret_key
+#      - db_password
+#      - db_username
+#      - db_name
+#    ports:
+#      - 8000:8000
+
+  db:
+     image: postgres
+     restart: always
+     user: postgres
+     secrets:
+       - db_password
+       - db_username
+       - db_name
+     volumes:
+       - db-data:/var/lib/postgresql/data
+     environment:
+       - POSTGRES_USER_FILE=/run/secrets/db_username
+       - POSTGRES_DB_FILE=/run/secrets/db_name
+       - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+     ports:
+       - "15432:5432"
+     healthcheck:
+       test: bash -c 'pg_isready -U $(cat /run/secrets/db_username)) -d $(cat /run/secrets/db_name)'
+       interval: 10s
+       timeout: 5s
+       retries: 5
+volumes:
+  db-data:
+secrets:
+  db_username:
+    file: docker/db/secrets/db_username.txt
+  db_password:
+    file: docker/db/secrets/db_password.txt
+  db_name:
+    file: docker/db/secrets/db_name.txt
+  django_secret_key:
+    file: docker/django/secrets/django_secret_key.txt
+
+

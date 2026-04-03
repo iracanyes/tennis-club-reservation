@@ -276,6 +276,7 @@ celerybeat.pid
 
 # Environments
 .env
+!.env.dist
 .envrc
 .venv
 env/
@@ -347,3 +348,8 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+# Docker Secrets
+secrets
+
+# Jetbrains DataGrid
+data

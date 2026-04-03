@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>{% block pageTitle %}Tennis Club Reservation - Generic page{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/svg/tennis-club.svg" />
+    <link
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap"
+          rel="stylesheet"
+    />
+</head>
+<body id="{% block bodyId %}base_page{% endblock %}">
+    <header>
+        {% block headerContent %}{% endblock %}
+    </header>
+    <aside>
+        {% block sidebarContent %}
+
+        {% endblock %}
+    </aside>
+    <main>
+        {% block mainContent %}
+            <section>
+                <h1>Homepage</h1>
+                <p>Bienvenue dans notre application de réservation de terrain de tennis!</p>
+                <p>Nous sommes le {{ current_date_time }}. </p>
+            </section>
+        {% endblock %}
+    </main>
+</body>
+</html>

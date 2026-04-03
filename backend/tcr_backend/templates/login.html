@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block pageTitle %} Tennis Club Reservation - Login {% endblock %}
+
+{% block bodyId %}login_page{% endblock %}
+
+{% block mainContent %}
+    <section id="content-main">
+        <div class="section">
+            <h1>Connexion</h1>
+            <p>Bienvenue dans notre application de réservation de terrain de tennis!</p>
+            <p>Nous sommes le {{ current_date_time }}. </p>
+        </div>
+        <div id="login-form">
+            <form action="login" method="post">
+                {% csrf_token %}
+                {% if error %}
+                    <p class="error">{{ error }}</p>
+                {% endif %}
+                <fieldset>
+                    <label for="aft_number">Numéro AFT</label>
+                    <input type="text" name="aft_number" id="aft_number" size="7" />
+                </fieldset>
+                <fieldset>
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password" id="password"  />
+                </fieldset>
+                <fieldset>
+                    <button type="submit" class="button">Connexion</button>
+                    <a href="/new_member">
+                        <button>Nouveau membre?</button>
+                    </a>
+                </fieldset>
+            </form>
+        </div>
+    </section>
+
+{% endblock %}
