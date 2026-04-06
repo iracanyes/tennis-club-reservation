@@ -3,4 +3,6 @@ Django
 psycopg
 # Dotenv support for Python
 python-dotenv
+# Requests
+djangorestframework
 
