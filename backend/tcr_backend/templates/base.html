@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark h-full">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -9,25 +9,30 @@
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap"
           rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
 </head>
-<body id="{% block bodyId %}base_page{% endblock %}">
+<body id="{% block bodyId %}base_page{% endblock %}" class="h-full">
     <header>
         {% block headerContent %}{% endblock %}
     </header>
-    <aside>
-        {% block sidebarContent %}
+    <section id="main-container" class="mt-20 flex flex-column">
 
+        {% block sidebarContent %}
+            <aside class="flex w-80 h-full bg-red">
+            </aside>
         {% endblock %}
-    </aside>
-    <main>
-        {% block mainContent %}
-            <section>
-                <h1>Homepage</h1>
-                <p>Bienvenue dans notre application de réservation de terrain de tennis!</p>
-                <p>Nous sommes le {{ current_date_time }}. </p>
-            </section>
-        {% endblock %}
-    </main>
+
+        <main class="flex flex-row grow-1 justify-center">
+            {% block mainContent %}
+                <section>
+                    <h1>Homepage</h1>
+                    <p>Bienvenue dans notre application de réservation de terrain de tennis!</p>
+                    <p>Nous sommes le {{ current_date_time }}. </p>
+                </section>
+            {% endblock %}
+        </main>
+    </section>
+
 </body>
 </html>

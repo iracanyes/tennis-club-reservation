@@ -9,10 +9,11 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 from tcr_backend.core.utils.docker_utils import read_secret
 import os
+from argon2 import PasswordHasher
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -42,7 +43,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tcr_backend'
+    'rest_framework',
+    'tcr_backend',
+    'members',
+    'administrators',
+    'reservations',
+    'subscriptions',
+    'tcr_auth'
 ]
 
 MIDDLEWARE = [
@@ -90,15 +97,24 @@ DATABASES = {
 }
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
+        # Checks the similarity between the password and a set of attributes of the user.
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'user_attributes': ('email','firstname', 'lastname', 'birthdate'),
+            'max_similarity': 0.7,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -114,7 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
 
@@ -129,3 +145,75 @@ STATIC_URL = 'static/'
 
 # Static files directory
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Substituting a custom User model for Django Auth
+AUTH_USER_MODEL = 'tcr_backend.Member'
+
+# Django maintains a list of “authentication backends” that it checks for authentication
+AUTHENTICATION_BACKENDS = [
+    'tcr_auth.config.backend.AdminBackend',
+    'tcr_auth.config.backend.MemberBackend',
+]
+
+# Define password hashers. You can add your own
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher"
+]
+
+# Redirect to HTTPS
+SECURE_SSL_REDIRECT=False
+#SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#SECURE_HSTS_PRELOAD = True
+#SECURE_HSTS_SECONDS = 31536000
+
+
+CSRF_COOKIE_HTTPONLY = True
+# Whether to use a secure cookie for the CSRF cookie. If this is set to True, the cookie will be marked as “secure”,
+# which means browsers may ensure that the cookie is only sent with an HTTPS connection
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_DOMAIN = None
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_HTTPONLY = True
+# Whether to store the CSRF token in the user’s session instead of in a cookie. It requires the use of django.contrib.sessions.
+CSRF_USE_SESSIONS = True
+
+# Rest framework configuration
+# See Django Rest Framework SimpleJWT : https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+#
+# See Django Rest Framework - Throttling : https://www.django-rest-framework.org/api-guide/throttling/
+# DEFAULT_THROTTLE_RATES
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # Bearer Token authentification
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # HTTP Only cookie authentification
+        'tcr_auth.config.JWTCookieAuthentication',
+    ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon' : '100/day',
+        'user' : '1000/day'
+    }
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    # Auth header
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    # Auth cookie
+    "AUTH_COOKIE_ACCESS" : "access_token",
+    "AUTH_COOKIE_REFRESH" : "refresh_token",
+    "AUTH_COOKIE_DOMAIN": None, # "example.com" or None for standard domain cookie
+    "AUTH_COOKIE_SAMESITE": 'Lax',
+    "AUTH_COOKIE_SECURE": True, # HTTPS only
+    # HTTP only cookie
+    "AUTH_COOKIE_HTTPONLY": True,
+    # Default "/", the cookie is sent with all requests. But refresh_token is needed only for certain route
+    "AUTH_COOKIE_REFRESH_PATH": "/auth/token/refresh",
+}

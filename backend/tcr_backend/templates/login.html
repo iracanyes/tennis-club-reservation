@@ -4,35 +4,64 @@
 
 {% block bodyId %}loginPage{% endblock %}
 
+{% block sidebarContent %} {% endblock %}
+
 {% block mainContent %}
-    <section id="content-main">
-        <div class="section">
-            <h1>Connexion</h1>
-            <p>Bienvenue dans notre application de réservation de terrain de tennis!</p>
-            <p>Nous sommes le {{ current_date_time }}. </p>
-        </div>
-        <div id="login-form">
-            <form action="login" method="post">
-                {% csrf_token %}
-                {% if error %}
-                    <p class="error">{{ error }}</p>
-                {% endif %}
-                <fieldset>
-                    <label for="aft_number">Numéro AFT</label>
-                    <input type="text" name="aft_number" id="aft_number" size="7" />
-                </fieldset>
-                <fieldset>
-                    <label for="password">Mot de passe</label>
-                    <input type="password" name="password" id="password"  />
-                </fieldset>
-                <fieldset>
-                    <button type="submit" class="button">Connexion</button>
-                    <a href="/new_member">
-                        <button>Nouveau membre?</button>
-                    </a>
-                </fieldset>
-            </form>
-        </div>
-    </section>
+
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <img src="/static/img/tsc_logo.png" alt="Tennis Club - Reservation" class="mx-auto w-auto h-10" />
+        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
+            Connexion
+        </h2>
+      </div>
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm lg:text-lg">
+          <p class="text-white">Bienvenue dans notre application de réservation de terrain de tennis!</p>
+          <p class="text-white">Nous sommes le {{ current_date_time }}. </p>
+      </div>
+
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form action="#" method="POST" class="space-y-6">
+            {% csrf_token %}
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+
+          <div>
+            <label for="aft_number" class="block text-sm/6 font-medium text-gray-100">Numéro AFT</label>
+            <div class="mt-2">
+              <input id="aft_number" type="email" name="aft_number" required autocomplete="aft_number" class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" />
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between">
+              <label for="password" class="block text-sm/6 font-medium text-gray-100">Mot de passe</label>
+              <div class="text-sm">
+                <a href="#" class="font-semibold text-indigo-400 hover:text-indigo-300">Forgot password?</a>
+              </div>
+            </div>
+            <div class="mt-2">
+              <input id="password" type="password" name="password" required autocomplete="current-password" class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" />
+            </div>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                Sign in
+            </button>
+            <button type="button" class="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                Sign in with Google
+            </button>
+
+          </div>
+        </form>
+
+        <p class="mt-10 text-center text-sm/6 text-gray-400">
+          Not a member?
+          <a href="#" class="font-semibold text-indigo-400 hover:text-indigo-300">Start a 14 day free trial</a>
+        </p>
+      </div>
+    </div>
 
 {% endblock %}

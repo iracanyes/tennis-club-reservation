@@ -5,4 +5,9 @@ psycopg
 python-dotenv
 # Requests
 djangorestframework
+# Password hasher
+argon2-cffi
+# JSON Web Token authentication
+djangorestframework-simplejwt[crypto]
+
 

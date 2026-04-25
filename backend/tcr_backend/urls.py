@@ -15,13 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
-from tcr_backend.views.home import home
-from tcr_backend.views.welcome import welcome
-from tcr_backend.views.login import login
+from django.urls import path, re_path, include
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
-    re_path('^welcome/$', welcome, name='welcome'),
-    re_path('^login/$', login, name='login'),
+    path('auth/', include('tcr_auth.urls')),
+    path('api/members/', include('members.urls')),
+    path("rest-api/", include("rest_framework.urls", namespace="rest_framework")),
 ]

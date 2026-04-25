@@ -232,6 +232,74 @@ without changing the Person model itself.
 ### Migrations
 
 ````bash
-$ python manage.py makemigrations
-$ python manage.py migrate []
+# Check app integrity
+$ python manage.py check 
+# Create migrations files
+$ python manage.py makemigrations [app_name]
+# Create or update DB schema 
+$ python manage.py migrate [app_name]
 ````
+
+## Admin site
+
+````bash 
+$ python manage.py createsuperuser
+````
+
+## Authentification
+
+### Argon2 : Password hasher
+First install the dependency
+````shell
+$ cd /path/to/django_project
+$ source .venv/Scripts/activate
+(.venv)
+$ pip install argon2-cffi
+````
+Next, define the password hashers' array inside ``settings.py``
+
+````python
+# Define password hashers. You can add your own
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher"
+]
+````
+
+
+### Generate password inside Python shell
+
+Run the python shell inside a virtual environment
+````shell
+$ cd /path/to/django_project
+$ source .venv/Scripts/activate
+(.venv)
+$ py
+````
+Generate a password using Django argon2 provided hasher 
+````python
+>>> from django.conf import settings 
+>>> from django.contrib.auth.hashers import make_password
+>>> settings.configure()
+>>> make_password('hello', hasher = 'argon2')
+'argon2$argon2id$v=19$m=102400,t=2,p=8$ajk1eGZWaUdOTWNJN1Exd0czV3JPcg$1xkVTrnNtf8pFuxuLohiW9xgymgQn51nXo2n/u1Ugzw'
+````
+### Generate password inside Django shell
+You can also run the Django shell. 
+Allow to django configuration and settings.
+
+````shell
+$ cd /path/to/django_project
+$ source .venv/Scripts/activate
+(.venv)
+$ pyhton manage.py shell
+````
+Generate a password using Django argon2 hasher provided 
+````python
+>>> from django.contrib.auth.hashers import make_password
+>>> make_password('hello', hasher = 'argon2')
+'argon2$argon2id$v=19$m=102400,t=2,p=8$ajk1eGZWaUdOTWNJN1Exd0czV3JPcg$1xkVTrnNtf8pFuxuLohiW9xgymgQn51nXo2n/u1Ugzw'
+````
+
+
