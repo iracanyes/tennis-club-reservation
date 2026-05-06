@@ -10,10 +10,6 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_active', True)
 
-        print(f"UserManager - create_superuser => aft_id : {aft_id}\n")
-        print(f"UserManager - create_superuser => email : {email}\n")
-        print(f"UserManager - create_superuser => extra_fields : {extra_fields}\n")
-
         if not email:
             raise ValueError('Email is required.')
 

@@ -10,7 +10,26 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /**/
+    "baseUrl": "./src",
+    "paths": {
+      "@assets/*": ["./assets/*"],
+      "@pages": ["./pages/index.ts"],
+      "@pages/*": ["./pages/*"],
+      "@components/*": ["./components/*"],
+      "@shared/*": ["./shared/*"],
+      "@layouts": ["./layouts/index.ts"],
+      "@layouts/*": ["./layouts/*"],
+      "@navigation": ["./navigation/index.ts"],
+      "@navigation/*": ["./navigation/*"],
+      "@services": ["./services/index.ts"],
+      "@services/*": ["./services/*"],
+      "@types": ["./types/index.ts"],
+      "@types/*": ["./types/*"]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+
 }

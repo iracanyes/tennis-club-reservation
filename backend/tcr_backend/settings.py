@@ -13,9 +13,10 @@ from datetime import timedelta
 from pathlib import Path
 from tcr_backend.core.utils.docker_utils import read_secret
 import os
-from argon2 import PasswordHasher
+#from argon2 import PasswordHasher
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'tcr_backend',
     'members',
     'administrators',
@@ -153,6 +156,7 @@ AUTH_USER_MODEL = 'tcr_backend.Member'
 AUTHENTICATION_BACKENDS = [
     'tcr_auth.config.backend.AdminBackend',
     'tcr_auth.config.backend.MemberBackend',
+    'tcr_auth.config.backend.AdminGoogleBackend'
 ]
 
 # Define password hashers. You can add your own
@@ -178,6 +182,13 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True
 # Whether to store the CSRF token in the user’s session instead of in a cookie. It requires the use of django.contrib.sessions.
 CSRF_USE_SESSIONS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "",
+    "http://localhost"
+]
+
+
 
 # Rest framework configuration
 # See Django Rest Framework SimpleJWT : https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
@@ -215,5 +226,6 @@ SIMPLE_JWT = {
     # HTTP only cookie
     "AUTH_COOKIE_HTTPONLY": True,
     # Default "/", the cookie is sent with all requests. But refresh_token is needed only for certain route
-    "AUTH_COOKIE_REFRESH_PATH": "/auth/token/refresh",
+    "AUTH_COOKIE_REFRESH_PATH": "/auth/",
+    "AUTH_COOKIE_USE_CSRF": True,
 }

@@ -10,7 +10,7 @@ class MemberLoginAPIView(APIView):
 
     def post(self, request):
 
-        print(f"MemberLoginView post request.data : {request.data}")
+
 
         serializer = MemberLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

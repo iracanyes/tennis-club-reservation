@@ -1,8 +1,16 @@
 from django.urls import path, re_path, include
 from rest_framework.routers import DefaultRouter
-from . import views
+
 from rest_framework_simplejwt.views import TokenVerifyView, TokenObtainPairView
-from .views import MemberLoginAPIView, AdminLoginAPIView, RefreshTokenAPIView, UserRetrieveAPIView
+
+from .views import (
+  MemberLoginAPIView,
+  AdminLoginAPIView,
+  RefreshTokenAPIView,
+  UserRetrieveAPIView,
+  LogoutAPIView,
+  AdminLoginGoogleAPIView
+)
 
 app_name = 'tcr_auth'
 
@@ -16,5 +24,7 @@ urlpatterns = [
   path('token/verify/', TokenVerifyView.as_view(), name='token_verify' ),
   path('member/login', MemberLoginAPIView.as_view(), name='member-login'),
   path('admin/login', AdminLoginAPIView.as_view(), name='admin-login'),
+  path('admin/login/google', AdminLoginGoogleAPIView.as_view() , name="admin-login-google"),
+  path('logout', LogoutAPIView.as_view() , name='logout')
 
 ]

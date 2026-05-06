@@ -9,7 +9,7 @@ from tcr_auth.config import set_token_cookies
 
 
 class AdminLoginAPIView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = []
 
     def post(self, request):
         serializer = AdminLoginSerializer(data=request.data)
@@ -20,7 +20,7 @@ class AdminLoginAPIView(APIView):
         # Create Token & Refresh token
         refresh = RefreshToken.for_user(admin)
 
-        response = Response({'status':status.HTTP_200_OK, 'data': {'token' : str(refresh.access_token), 'refresh_token' : str(refresh), 'type' : 'admin'}})
+        response = Response({'status':status.HTTP_200_OK, 'data': {'token' : str(refresh.access_token), 'type' : 'admin'}})
 
         # Set token on HTTP only cookies
         set_token_cookies(response, str(refresh.access_token), str(refresh))

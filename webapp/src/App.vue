@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import feather from "feather-icons"
+
+// Replace all feather-icons
+feather.replace();
 </script>
 
 <template>
-  <HelloWorld />
+  <RouterView></RouterView>
 </template>
