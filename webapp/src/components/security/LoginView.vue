@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiRoutes from "@navigation/api.routes.ts";
-import {APIService, TokenService} from "@services";
+import {APIService, CSRFService, TokenService} from "@services";
 
 const aft_id = ref('');
 const password = ref('');
@@ -10,6 +10,7 @@ const password = ref('');
 const router = useRouter();
 const apiService = APIService.getInstance();
 const tokenService = TokenService.getInstance();
+const csrfTokenService = CSRFService.getInstance();
 
 async function submit(e : Event){
   e.preventDefault();
@@ -23,6 +24,9 @@ async function submit(e : Event){
 		console.log(`submit - response : ${JSON.stringify(response)}`)
     if(response.token && response.token !== ""){
       tokenService.setToken(response);
+
+			// CSRF Token has been rotated on login. Delete CSRF Token
+			csrfTokenService.deleteToken();
 
       // Redirect to dashboard
       await router.push({

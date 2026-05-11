@@ -12,7 +12,8 @@ const apiService = APIService.getInstance();
 const hasError = ref(false);
 const error = ref('')
 
-const submit = async () => {
+const submit = async (e: Event) => {
+	e.preventDefault();
 
 	if(newPassword.value !== confirmNewPassword.value) {
 		// Display message
@@ -34,11 +35,11 @@ const submit = async () => {
 			// Notify successfully changed password
 
 			// Return to dashboard
-			await router.push({ name: "dashboard" });
+			await router.push({ name: "home" });
 		}
-	}catch(e){
+	}catch(e : any){
 		// Notify error on API call
-
+		console.log(`${e.message}`)
 	}
 }
 

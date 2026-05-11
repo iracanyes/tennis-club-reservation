@@ -46,6 +46,10 @@ class CSRFService {
     }
   }
 
+  public deleteToken() {
+    this.csrf_token.value = "";
+  }
+
 
 }
 

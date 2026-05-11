@@ -3,7 +3,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiRoutes from "@navigation/api.routes.ts";
-import { APIService, TokenService } from "@services";
+import { APIService, TokenService, CSRFService } from "@services";
 //import { jwtDecode } from "jwt-decode";
 
 const email = ref('');
@@ -11,7 +11,7 @@ const password = ref('');
 const router = useRouter();
 const apiService = APIService.getInstance();
 const tokenService = TokenService.getInstance();
-
+const csrfTokenService = CSRFService.getInstance();
 
 onMounted(() => {
 	// @ts-ignore
@@ -28,8 +28,11 @@ async function submit(e : Event){
     let response = await apiService.post(ApiRoutes.AdminLogin, { email: email.value, password: password.value });
 
     if(response.token){
-      // Use token
+      // Set access token
 			tokenService.setToken(response);
+
+			// CSRF Token has been rotated on login. Delete CSRF Token
+			csrfTokenService.deleteToken();
 
       // Redirect to dashboard
       await router.push({

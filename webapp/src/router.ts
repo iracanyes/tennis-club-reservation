@@ -38,7 +38,10 @@ const routes = [
       {
         path: "/profile/change_password",
         component: () => import("@components/security/ChangePasswordView.vue"),
-        name: "change_password"
+        name: "change_password",
+        meta: {
+          requiresAuth: true
+        }
       },
     ]
   },

@@ -1,7 +1,7 @@
 import CSRFService from "./csrf.service.ts";
 import {isNil} from "lodash";
 import CookieService from "./cookie.service.ts";
-import cookieService from "./cookie.service.ts";
+import {useRouter} from "vue-router";
 
 
 class APIService {
@@ -9,6 +9,7 @@ class APIService {
   private readonly baseUrl: string = import.meta.env.VITE_API_URL;
   private readonly csrfService: CSRFService = CSRFService.getInstance();
   private readonly cookieService : CookieService = CookieService.getInstance();
+  private readonly router = useRouter();
 
   private constructor() {}
 
@@ -47,6 +48,13 @@ class APIService {
           body: JSON.stringify(payload),
         }
       );
+
+      if(response.status === 401){
+        if(localStorage.getItem('access_token')){
+
+        }
+        await this.router.push({ name : 'login' });
+      }
 
       if(!response.ok){
         throw new Error(`${response.status} : ${response.statusText}`);
