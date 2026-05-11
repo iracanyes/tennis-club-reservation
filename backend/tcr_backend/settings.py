@@ -173,20 +173,24 @@ SECURE_SSL_REDIRECT=False
 #SECURE_HSTS_SECONDS = 31536000
 
 
-CSRF_COOKIE_HTTPONLY = True
-# Whether to use a secure cookie for the CSRF cookie. If this is set to True, the cookie will be marked as “secure”,
-# which means browsers may ensure that the cookie is only sent with an HTTPS connection
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_DOMAIN = None
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_HTTPONLY = True
-# Whether to store the CSRF token in the user’s session instead of in a cookie. It requires the use of django.contrib.sessions.
-CSRF_USE_SESSIONS = True
-
+CSRF_COOKIE_NAME = 'csrf_token'
 CSRF_TRUSTED_ORIGINS = [
-    "",
+    "http://tennis-club-reservation.be",
+    "http://localhost:5173",
     "http://localhost"
 ]
+#CSRF_COOKIE_HTTPONLY = True
+# Whether to use a secure cookie for the CSRF cookie. If this is set to True, the cookie will be marked as “secure”,
+# which means browsers may ensure that the cookie is only sent with an HTTPS connection
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_DOMAIN = None
+#CSRF_COOKIE_SAMESITE = 'Lax'
+#SESSION_COOKIE_HTTPONLY = True
+# Whether to store the CSRF token in the user’s session instead of in a cookie. It requires the use of django.contrib.sessions.
+#CSRF_USE_SESSIONS = True
+
+
+
 
 
 
@@ -227,5 +231,6 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_HTTPONLY": True,
     # Default "/", the cookie is sent with all requests. But refresh_token is needed only for certain route
     "AUTH_COOKIE_REFRESH_PATH": "/auth/",
+    # Enable CSRF Validation
     "AUTH_COOKIE_USE_CSRF": True,
 }

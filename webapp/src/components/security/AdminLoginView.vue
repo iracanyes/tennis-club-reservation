@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiRoutes from "@navigation/api.routes.ts";
 import { APIService, TokenService } from "@services";
-import { jwtDecode } from "jwt-decode";
+//import { jwtDecode } from "jwt-decode";
 
 const email = ref('');
 const password = ref('');
@@ -14,6 +14,7 @@ const tokenService = TokenService.getInstance();
 
 
 onMounted(() => {
+	// @ts-ignore
 	if(typeof google !== 'undefined'){
 		initGoogleSignIn();
 	}

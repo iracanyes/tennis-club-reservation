@@ -1,1 +1,2 @@
 from .admin_login_google_serializer import AdminLoginGoogleSerializer
+from .change_password_serializer import ChangePasswordSerializer
