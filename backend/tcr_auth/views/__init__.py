@@ -4,6 +4,8 @@ from .refresh_token_api_view import RefreshTokenAPIView
 from .user_retrieve_api_view import UserRetrieveAPIView
 from .logout_api_view import LogoutAPIView
 from .admin_login_google_api_view import AdminLoginGoogleAPIView
+from .csrf_api_view import CRSFApiView
+from .change_password_api_view import ChangePasswordAPIView
 
 from .admin_login_form import AdminEmailLoginForm
 from .member_login_form import MemberLoginForm

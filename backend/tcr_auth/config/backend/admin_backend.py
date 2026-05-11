@@ -7,7 +7,7 @@ class AdminBackend(ModelBackend):
     Authenticate administrators with their email addresses
     """
     def authenticate(self, request, email=None, password=None, **extra_fields):
-        print(f"AdminBackend.authenticate arguments : {{ email = {email}, password = {password}, extra_fields = {extra_fields} }}")
+        #print(f"AdminBackend.authenticate arguments : {{ email = {email}, password = {password}, extra_fields = {extra_fields} }}")
         try:
             admin = Admin.objects.get(email=email)
 

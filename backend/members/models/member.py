@@ -63,7 +63,7 @@ class Member(AbstractUser):
   def __str__(self):
     return f"""{{
       'id': {self.id},
-      'aftNumber': {self.aft_id},
+      'aftId': {self.aft_id},
       'firstname': {self.firstname},
       'lastname': {self.lastname},
       'gender': {self.gender},

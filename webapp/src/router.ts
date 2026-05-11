@@ -1,7 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 
 // Chargement des vues
-import { LoginView, AdminLoginView } from "./components/security";
+//import { LoginView, AdminLoginView } from "./components/security";
 import {DashboardLayout} from "@layouts";
 import {DashboardHome, HomeView, NotFound } from "@pages";
 import {isNil} from "lodash";
@@ -36,9 +36,9 @@ const routes = [
         }
       },
       {
-        path: "home",
-        component: DashboardHome,
-        name: "dashboard"
+        path: "/profile/change_password",
+        component: () => import("@components/security/ChangePasswordView.vue"),
+        name: "change_password"
       },
     ]
   },
@@ -51,10 +51,9 @@ const router = createRouter({
 });
 
 // Global security route guards
+//@ts-ignore
 router.beforeEach((to, from) => {
   const tokenString = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY);
-
-  console.log(`Route guard - tokenString: ${tokenString!}`);
 
   if(!isNil(tokenString) && JSON.parse(tokenString).token.length > 0) {
     return true

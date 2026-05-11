@@ -22,7 +22,7 @@ class MemberLoginSerializer(serializers.Serializer):
     def validate(self, data):
         member = authenticate(aft_id=data['aft_id'], password=data['password'])
 
-        print(f"MemberLoginSerializer.validate: {member}")
+        #print(f"MemberLoginSerializer.validate: {member}")
 
         if not member:
             raise serializers.ValidationError("AFT ID or password is incorrect.")

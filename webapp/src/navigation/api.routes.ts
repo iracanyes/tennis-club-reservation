@@ -7,6 +7,8 @@ const ApiRoutes = {
   RefreshToken : '/auth/refresh_token',
   Me : 'auth/token/verify',
   Logout : '/logout',
+  CsrfToken : '/auth/csrf_token',
+  ChangePassword : '/auth/change_password',
   MemberList : '/api/members',
 } as const
 

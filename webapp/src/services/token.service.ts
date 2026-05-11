@@ -5,6 +5,7 @@ import  { type Token } from "@types"
 class TokenService {
   private static instance: TokenService | null = null;
   private readonly token =  reactive(this.getToken());
+  // @ts-ignore
   private readonly tokenSaveHandler = watch(this.token, () => this.handleTokenChange(this.token))
 
   public static getInstance(): TokenService{

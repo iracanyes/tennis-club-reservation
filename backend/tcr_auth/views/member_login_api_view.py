@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from tcr_auth.config import set_token_cookies
 from members.serializers import MemberLoginSerializer
+from django.middleware.csrf import rotate_token
+
 
 class MemberLoginAPIView(APIView):
     permission_classes = []
@@ -17,6 +19,7 @@ class MemberLoginAPIView(APIView):
 
         member = serializer.validated_data['member']
 
+
         # Create auth token & refresh token
         refresh = RefreshToken.for_user(member)
 
@@ -26,5 +29,8 @@ class MemberLoginAPIView(APIView):
 
         # Set token on HTTP only cookies
         set_token_cookies(response, str(refresh.access_token), str(refresh))
+
+        # Rotate CSRF token : invalidate old CSRF Token
+        rotate_token(request)
 
         return response

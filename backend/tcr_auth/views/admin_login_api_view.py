@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from administrators.serializers import AdminLoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.middleware.csrf import rotate_token
 from tcr_auth.config import set_token_cookies
 
 
@@ -24,6 +24,9 @@ class AdminLoginAPIView(APIView):
 
         # Set token on HTTP only cookies
         set_token_cookies(response, str(refresh.access_token), str(refresh))
+
+        # Rotate CSRF token : invalidate old CSRF Token
+        rotate_token(request)
 
         return response
 

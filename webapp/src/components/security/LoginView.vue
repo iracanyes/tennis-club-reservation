@@ -6,7 +6,7 @@ import {APIService, TokenService} from "@services";
 
 const aft_id = ref('');
 const password = ref('');
-const environment = import.meta.env;
+//const environment = import.meta.env;
 const router = useRouter();
 const apiService = APIService.getInstance();
 const tokenService = TokenService.getInstance();

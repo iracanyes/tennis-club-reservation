@@ -1,7 +1,15 @@
+import CSRFService from "./csrf.service.ts";
+import {isNil} from "lodash";
+import CookieService from "./cookie.service.ts";
+import cookieService from "./cookie.service.ts";
+
 
 class APIService {
   private static instance: APIService;
   private readonly baseUrl: string = import.meta.env.VITE_API_URL;
+  private readonly csrfService: CSRFService = CSRFService.getInstance();
+  private readonly cookieService : CookieService = CookieService.getInstance();
+
   private constructor() {}
 
   public static getInstance() {
@@ -12,6 +20,18 @@ class APIService {
   }
 
   public async post(urlPath: string, payload: any): Promise<any> {
+
+    let csrf_token = await this.csrfService.getToken();
+
+    if(isNil(csrf_token) || csrf_token.length === 0) {
+      throw new Error(`csrf_token is not a valid token`);
+    }
+
+    console.log(`APIService.post - csrf_token : ${csrf_token}`);
+
+    let csrfCookie = this.cookieService.getCookie('csrf_token');
+    console.log(`APIService.post - cookie.csrf_token : ${csrfCookie}`);
+
     try{
       const response = await fetch(
         this.baseUrl + urlPath,
@@ -19,9 +39,10 @@ class APIService {
           method: 'POST',
           mode: 'cors',
           cache: 'no-cache',
-          credentials: 'same-origin',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
+            'X-CSRFToken': isNil(csrfCookie) ? "" : csrfCookie,
           },
           body: JSON.stringify(payload),
         }
@@ -30,6 +51,8 @@ class APIService {
       if(!response.ok){
         throw new Error(`${response.status} : ${response.statusText}`);
       }
+
+
 
       return await response.json();
     }catch (e) {

@@ -1,6 +1,9 @@
 from django.conf import settings
+from rest_framework.authentication import CSRFCheck
 from rest_framework.request import Request
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from .csrf_permission_denied_error import CSRFPermissionDeniedError
 
 
 class JWTCookieAuthentication(JWTAuthentication):
@@ -10,11 +13,15 @@ class JWTCookieAuthentication(JWTAuthentication):
         #print(f"JWTCookieAuthentication - authenticate : header: {header}")
 
         if header is None:
-            raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE_ACCESS"])
+            raw_token = request.COOKIES.get(settings.SIMPLE_JWT["AUTH_COOKIE_ACCESS"]) or None
         else:
             raw_token = self.get_raw_token(header)
 
         #print(f"JWTCookieAuthentication - authenticate : raw_token: {raw_token}")
+
+        # Add CSRF validation to the Authentification class
+        if settings.SIMPLE_JWT["AUTH_COOKIE_USE_CSRF"]:
+            self.enforce_csrf(request)
 
 
         if raw_token is None:
@@ -26,3 +33,18 @@ class JWTCookieAuthentication(JWTAuthentication):
 
 
         return self.get_user(validated_token), validated_token
+
+
+    def enforce_csrf(self, request):
+        def dummy_get_response(_):
+            return None
+
+        check = CSRFCheck(dummy_get_response)
+
+        check.process_request(request)
+        reason = check.process_view(request, None, (), {})
+
+        print(f"JWTCookieAuthentication - enforce_csrf : reason: {reason}")
+
+        if reason:
+            raise CSRFPermissionDeniedError(f"CSRF Failed: {reason}")

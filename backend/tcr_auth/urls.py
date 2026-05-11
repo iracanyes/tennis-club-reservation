@@ -3,13 +3,16 @@ from rest_framework.routers import DefaultRouter
 
 from rest_framework_simplejwt.views import TokenVerifyView, TokenObtainPairView
 
+
 from .views import (
   MemberLoginAPIView,
   AdminLoginAPIView,
   RefreshTokenAPIView,
   UserRetrieveAPIView,
   LogoutAPIView,
-  AdminLoginGoogleAPIView
+  AdminLoginGoogleAPIView,
+  CRSFApiView,
+  ChangePasswordAPIView,
 )
 
 app_name = 'tcr_auth'
@@ -25,6 +28,8 @@ urlpatterns = [
   path('member/login', MemberLoginAPIView.as_view(), name='member-login'),
   path('admin/login', AdminLoginAPIView.as_view(), name='admin-login'),
   path('admin/login/google', AdminLoginGoogleAPIView.as_view() , name="admin-login-google"),
-  path('logout', LogoutAPIView.as_view() , name='logout')
+  path('logout', LogoutAPIView.as_view() , name='logout'),
+  path('csrf_token', CRSFApiView.as_view() , name='csrf_token'),
+  path('change_password', ChangePasswordAPIView.as_view() , name = 'change_password'),
 
 ]
