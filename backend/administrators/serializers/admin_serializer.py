@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from administrators.models import Admin
-from members.serializers.address_serializer import AddressSerializer
+from members.serializers import AddressSerializer
 
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -9,7 +9,7 @@ class AdminSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Admin
-        fields = ["id", 'email', 'aftId', 'firstname', 'lastname', 'birthdate', 'gender', 'phoneNumber', 'annualFeePaid', 'is_staff', 'is_active', 'address']
+        fields = ["id", 'email', 'aft_id', 'password', 'firstname', 'lastname', 'birthdate', 'gender', 'phone_number', 'annual_fee_paid', 'is_staff', 'is_active', 'address']
 
 
 class AdminLoginSerializer(serializers.Serializer):

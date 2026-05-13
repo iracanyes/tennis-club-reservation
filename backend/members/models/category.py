@@ -26,10 +26,10 @@ class Category(models.Model):
     {{
       'id' : {self.id},
       'name': {self.name},
-      'ageMin' : {self.ageMin},
-      'ageMax' : {self.ageMax},
-      'birthYearMin' : {self.birthYearMin},
-      'birthYearMax' : {self.birthYearMax},
+      'ageMin' : {self.age_min},
+      'ageMax' : {self.age_max},
+      'birthYearMin' : {self.birth_year_min},
+      'birthYearMax' : {self.birth_year_max},
       'gender' : {self.gender},
       'description': {self.description}
     }}

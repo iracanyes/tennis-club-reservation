@@ -24,6 +24,6 @@ class ChangePasswordSerializer(serializers.Serializer):
         if data["new_password"] != data["confirm_new_password"]:
             raise serializers.ValidationError("Les nouveaux mots de passe fournit ne correspondent pas.")
 
-        data["member"] = member;
+        data["member"] = member
 
         return data

@@ -2,8 +2,8 @@ import { createWebHistory, createRouter } from "vue-router";
 
 // Chargement des vues
 //import { LoginView, AdminLoginView } from "./components/security";
-import {DashboardLayout} from "@layouts";
-import {DashboardHome, HomeView, NotFound } from "@pages";
+import { DashboardLayout } from "@layouts";
+import { HomeView, NotFound } from "@pages";
 import {isNil} from "lodash";
 
 // Define routes
@@ -58,9 +58,14 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   const tokenString = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY);
 
-  if(!isNil(tokenString) && JSON.parse(tokenString).token.length > 0) {
-    return true
-  }else if (!to.path.includes("login")) {
+  // all routes are private except authentication routes
+  if(to.meta.requiresAuth) {
+    if(!isNil(tokenString) && JSON.parse(tokenString).token.length > 0){
+      return true;
+    }else{
+      return {name: 'login'};
+    }
+  } else if (!to.path.includes("login")) {
     return {name: 'login'};
   }
 

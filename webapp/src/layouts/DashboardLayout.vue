@@ -3,6 +3,9 @@
 </script>
 
 <template>
+	<header>
+		
+	</header>
   <router-view />
 </template>
 

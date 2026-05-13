@@ -217,7 +217,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     # Auth header
     "AUTH_HEADER_TYPES": ("Bearer",),
@@ -232,5 +232,5 @@ SIMPLE_JWT = {
     # Default "/", the cookie is sent with all requests. But refresh_token is needed only for certain route
     "AUTH_COOKIE_REFRESH_PATH": "/auth/",
     # Enable CSRF Validation
-    "AUTH_COOKIE_USE_CSRF": True,
+    "AUTH_COOKIE_USE_CSRF": False,
 }
