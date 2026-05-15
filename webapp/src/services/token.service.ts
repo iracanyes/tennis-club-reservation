@@ -1,4 +1,4 @@
-import { reactive, watch } from "vue";
+import {computed, reactive, watch} from "vue";
 import { isNil } from "lodash";
 import  { type Token } from "@types"
 
@@ -7,6 +7,10 @@ class TokenService {
   private readonly token =  reactive(this.getToken());
   // @ts-ignore
   private readonly tokenSaveHandler = watch(this.token, () => this.handleTokenChange(this.token))
+
+  public readonly isAdmin = computed(() => this.token?.type == "admin");
+
+  public readonly authenticated = computed(() => !isNil(this.token?.token));
 
   public static getInstance(): TokenService{
     if(isNil(TokenService.instance))
@@ -49,6 +53,8 @@ class TokenService {
       localStorage.removeItem(import.meta.env.VITE_TOKEN_KEY);
     }
   }
+
+
 }
 
 export default TokenService;

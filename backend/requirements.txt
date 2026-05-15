@@ -9,5 +9,8 @@ djangorestframework
 argon2-cffi
 # JSON Web Token authentication
 djangorestframework-simplejwt[crypto]
-
+# Google OAuth
+google-auth
+# Stripe payments API
+stripe
 

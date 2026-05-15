@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiRoutes from "@navigation/api.routes.ts";
 import { APIService, TokenService, CSRFService } from "@services";
-//import { jwtDecode } from "jwt-decode";
+import { useToast } from "primevue";
 
 const email = ref('');
 const password = ref('');
@@ -12,6 +12,7 @@ const router = useRouter();
 const apiService = APIService.getInstance();
 const tokenService = TokenService.getInstance();
 const csrfTokenService = CSRFService.getInstance();
+const toast = useToast();
 
 onMounted(() => {
 	// @ts-ignore
@@ -42,6 +43,14 @@ async function submit(e : Event){
 
   }catch (e: any) {
     console.log(`AdminLoginView - error occured :\n ${e.message}`);
+
+		// Afficher un message d'erreur
+		toast.add({
+			severity: 'error',
+			summary: 'Error occured while logging in',
+			detail : e.message,
+			life : 3000
+		});
   }
 
 
