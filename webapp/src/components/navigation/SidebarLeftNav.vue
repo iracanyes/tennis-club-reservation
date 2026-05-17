@@ -97,7 +97,7 @@ const items = ref([
 			{
 				label:"S'abonner",
 				icon: 'pi pi-dollar',
-				route : "/subscriptions/payment",
+				route : "/subscribe",
 			},
 			...(tokenService.isAdmin.value
 				? [

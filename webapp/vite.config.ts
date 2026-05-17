@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path"
+import * as fs from "node:fs";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -26,9 +27,16 @@ export default defineConfig({
   },
   server: {
     host: process.env.VITE_SERVER_HOST,
+    cors: {
+      origin: "http://locahost:8000 https://checkout.stripe.com"
+    },
     // Development server security
+    https: {
+      key: fs.readFileSync(path.join(__dirname, './resources/webapp/certs/server.key'), 'utf8'),
+      cert: fs.readFileSync(path.join(__dirname, './resources/webapp/certs/server.crt'), 'utf8')
+    },
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': 'http://localhost:8000 https://checkout.stripe.com https://accounts.google.com',
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '0',

@@ -6,10 +6,12 @@ const ApiRoutes = {
   UpdatePassword : '/auth/change_password',
   RefreshToken : '/auth/refresh_token',
   Me : 'auth/token/verify',
-  Logout : '/logout',
+  Logout : '/auth/logout',
   CsrfToken : '/auth/csrf_token',
   ChangePassword : '/auth/change_password',
   MemberList : '/api/members',
+  StripeCheckoutSession : '/api/payment/checkout_session',
+  PlanList: '/api/plans',
 } as const
 
 export default ApiRoutes

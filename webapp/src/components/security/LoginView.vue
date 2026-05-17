@@ -6,7 +6,6 @@ import {APIService, CSRFService, TokenService} from "@services";
 
 const aft_id = ref('');
 const password = ref('');
-//const environment = import.meta.env;
 const router = useRouter();
 const apiService = APIService.getInstance();
 const tokenService = TokenService.getInstance();
@@ -28,10 +27,17 @@ async function submit(e : Event){
 			// CSRF Token has been rotated on login. Delete CSRF Token
 			csrfTokenService.deleteToken();
 
+			console.log(`LoginView - previous route : `, router.options.history.state.back)
+
       // Redirect to dashboard
-      await router.push({
-        name: 'home',
-      });
+			if(typeof router.options.history.state.back === "string" ){
+				await router.push((router.options.history.state.back as string));
+			}else{
+				await router.push({
+					name: 'home',
+				});
+			}
+
     }
 
   }catch (e: any) {

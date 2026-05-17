@@ -13,4 +13,5 @@ djangorestframework-simplejwt[crypto]
 google-auth
 # Stripe payments API
 stripe
-
+# Django CORS headers library
+django-cors-headers

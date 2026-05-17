@@ -11,11 +11,11 @@ class Subscription(models.Model):
     ordering = ['-date_created']
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  dateCreated = models.DateTimeField(name='date_created')
+  date_created = models.DateTimeField(name='date_created', auto_now_add=True)
   year = models.IntegerField()
-  fee = models.FloatField()
-  paidInCash = models.BooleanField(name='paid_in_cash', default=False)
-  reference = models.CharField(max_length=50)
+  fee = models.DecimalField(max_digits=10, decimal_places=2)
+  paid_in_cash = models.BooleanField(name='paid_in_cash', default=False)
+  reference = models.CharField(max_length=255)
 
   member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='subscriptions')
 
@@ -24,10 +24,10 @@ class Subscription(models.Model):
     return f"""
     {{
       'id' : {self.id},
-      'dateCreated' : {self.dateCreated},
+      'dateCreated' : {self.date_created},
       'year' : {self.year},
       'fee' : {self.fee},
-      'paidInCash' : {self.paidInCash},
+      'paidInCash' : {self.paid_in_cash},
       'reference' : {self.reference},
       'member' : {self.member},
     }}

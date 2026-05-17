@@ -4,9 +4,9 @@ import App from './App.vue';
 import { router }  from './router';
 import PrimeVue from 'primevue/config';
 import Aura from "@primeuix/themes/aura";
-import { ToastService } from "primevue";
+import {Ripple, ToastService} from "primevue";
 
-createApp(App)
+const app = createApp(App)
   .use(router)
   .use(PrimeVue, {
     theme: {
@@ -17,5 +17,8 @@ createApp(App)
     },
     //ripple : true
   })
-  .use(ToastService)
-  .mount('#app');
+  .use(ToastService);
+// Add directive ripple
+app.directive('ripple', Ripple);
+
+app.mount('#app');

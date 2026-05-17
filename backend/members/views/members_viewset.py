@@ -24,7 +24,6 @@ class MemberViewSet(viewsets.ModelViewSet):
     return serializer_class
 
 
-
   def get_permissions(self):
     if self.action == 'list' or self.action == 'retrieve':
       permission_classes = [permissions.IsAuthenticated]

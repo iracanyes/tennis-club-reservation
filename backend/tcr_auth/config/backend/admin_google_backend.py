@@ -3,7 +3,6 @@ from django.contrib.auth.backends import ModelBackend
 from administrators.models import Admin
 from google.oauth2 import id_token
 from google.auth.transport import requests
-from rest_framework.exceptions import ValidationError
 
 class AdminGoogleBackend(ModelBackend):
     """

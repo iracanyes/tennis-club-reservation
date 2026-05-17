@@ -2,6 +2,7 @@ import CSRFService from "./csrf.service.ts";
 import {isNil} from "lodash";
 import CookieService from "./cookie.service.ts";
 import {useRouter} from "vue-router";
+import tokenService from "@services/token.service.ts";
 
 
 class APIService {
@@ -51,7 +52,7 @@ class APIService {
 
       if(response.status === 401){
         if(localStorage.getItem('access_token')){
-
+          tokenService.getInstance().setToken(null);
         }
         await this.router.push({ name : 'login' });
       }
@@ -69,13 +70,29 @@ class APIService {
   }
 
   public async get(urlPath: string): Promise<any> {
+    let csrf_token = await this.csrfService.getToken();
+
+    if(isNil(csrf_token) || csrf_token.length === 0) {
+      throw new Error(`csrf_token is not a valid token`);
+    }
+
     try {
-      const response = await fetch(urlPath, {
+      const response = await fetch(this.baseUrl + urlPath, {
         method: 'GET',
         mode: 'cors',
         cache: 'default',
-        credentials: 'same-origin',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
       })
+
+      if(response.status === 401){
+        if(localStorage.getItem('access_token')){
+          tokenService.getInstance().setToken(null);
+        }
+        await this.router.push({ name : 'login' });
+      }
 
       if(!response.ok){
         throw new Error(`${response.status} : ${response.statusText}`);

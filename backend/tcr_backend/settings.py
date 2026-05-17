@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
     'tcr_backend',
     'members',
     'administrators',
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -172,19 +174,31 @@ SECURE_SSL_REDIRECT=False
 #SECURE_HSTS_PRELOAD = True
 #SECURE_HSTS_SECONDS = 31536000
 
+# COR Allow Origins
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost:5173",
+    "http://localhost:8000",
+    "https://checkout.stripe.com",
+]
+
+# CORS Allow credentials
+# 
+CORS_ALLOW_CREDENTIALS = True
+
 
 CSRF_COOKIE_NAME = 'csrf_token'
 CSRF_TRUSTED_ORIGINS = [
     "http://tennis-club-reservation.be",
-    "http://localhost:5173",
-    "http://localhost"
+    "http://localhost:8000",
+    "https://localhost:5173",
+    "https://checkout.stripe.com"
 ]
 #CSRF_COOKIE_HTTPONLY = True
 # Whether to use a secure cookie for the CSRF cookie. If this is set to True, the cookie will be marked as “secure”,
 # which means browsers may ensure that the cookie is only sent with an HTTPS connection
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_DOMAIN = None
-#CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 #SESSION_COOKIE_HTTPONLY = True
 # Whether to store the CSRF token in the user’s session instead of in a cookie. It requires the use of django.contrib.sessions.
 #CSRF_USE_SESSIONS = True

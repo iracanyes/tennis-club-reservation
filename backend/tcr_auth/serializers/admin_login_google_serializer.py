@@ -1,8 +1,5 @@
-from django.contrib.auth import authenticate
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-
-from administrators.models import Admin
 
 
 class AdminLoginGoogleSerializer(serializers.Serializer):

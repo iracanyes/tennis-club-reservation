@@ -19,7 +19,7 @@ class TokenService {
     return TokenService.instance;
   }
 
-  setToken(token: Token) {
+  setToken(token: Token|null) {
 
     if(token && token.token.trim().length > 0){
       this.token.token = token.token;
