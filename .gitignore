@@ -353,3 +353,4 @@ secrets
 
 # Jetbrains DataGrid
 data
+backend/**/migrations

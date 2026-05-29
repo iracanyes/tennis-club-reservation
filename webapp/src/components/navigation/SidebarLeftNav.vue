@@ -14,7 +14,7 @@ const items = ref([
 	{
 		label : "Accueil",
 		icon : "pi pi-home",
-		command : () => router.push({ name : "home"}),
+		command : () => router.push({ name : "home" }),
 	},
 	{
 		label: 'Réservations',
@@ -24,8 +24,7 @@ const items = ref([
 			{
 				label: 'Liste des réservations',
 				icon: 'pi pi-calendar-times',
-				shortcut: '⌘+N',
-				route: "/reservations",
+				route: "/reservations/list",
 			},
 			{
 				label: 'Mes réservations',
@@ -36,19 +35,17 @@ const items = ref([
 			{
 				label: 'Annuler une réservation',
 				icon: 'pi pi-send',
-				shortcut: '⌘+S',
 				route: "/reservations/cancel",
 			}
 		]
 	},
 	{
 		label: 'Événements',
-		icon: 'pi pi-chart-bar',
-		shortcut: '⌘+R',
+		icon: 'pi pi-calendar-clock',
 		items: [
 			{
 				label: 'Liste des événements',
-				icon: 'pi pi-chart-line',
+				icon: 'pi pi-trophy',
 				badge: 3,
 				route: "/events",
 			},
@@ -68,9 +65,29 @@ const items = ref([
 		]
 	},
 	{
+		label: 'Terrains',
+		icon: 'pi pi-objects-column',
+		items: [
+			...(tokenService.isAdmin.value
+					? [
+						{
+							label : 'Ajouter un terrain',
+							icon : 'pi pi-flag',
+							route : '/courts/add'
+						},
+						{
+							label : 'Supprimer un terrain',
+							icon : 'pi pi-map',
+							route : '/courts/delete'
+						}
+					]
+					: []
+			)
+		]
+	},
+	{
 		label: 'Membres',
 		icon: 'pi pi-users',
-		shortcut: '⌘+W',
 		items: [
 			{
 				label: 'Liste des membres',
@@ -104,13 +121,13 @@ const items = ref([
 						{
 							label: 'Liste des abonnements',
 							icon: 'pi pi-money-bill',
-							route : "/abonnements",
+							route : "/subscriptions",
 							adminOnly: true,
 						},
 						{
 							label: 'Valider un abonnement',
 							icon: 'pi pi-check-circle',
-							route : "/abonnements/add",
+							route : "/subscriptions/add",
 							adminOnly: true,
 						}
 					]
@@ -131,7 +148,7 @@ const items = ref([
 			{
 				label: 'Changer son mot de passe',
 				icon: 'pi pi-shield',
-				route : "/change_password"
+				route : "/profile/change_password"
 			}
 		]
 	}
@@ -141,12 +158,12 @@ const items = ref([
 </script>
 
 <template>
-	<div class="flex flex-col">
+	<div class="h-full flex flex-col">
 		<div id="logo" class="h-14 w-full flex flex-row bg-lime-500 p-2 mb-4">
-			<img src="/src/assets/tsc_logo.png" alt="TCR - Réservations" class="w-10 rounded-sm mr-2"/>
+			<img src="/src/assets/img/tsc_logo.png" alt="TCR - Réservations" class="w-10 rounded-sm mr-2"/>
 			<p class="h-8 mt-2 flex text-md font-semibold text-white-100 text-center align-middle">TCR - Réservations</p>
 		</div>
-		<div id="sidebar-left-menu" class="card flex-1 justify-content-center bg-lime-500">
+		<div id="sidebar-left-menu" class="h-full card flex-1 justify-content-center bg-lime-500">
 			<PanelMenu :model="items" class="w-full md:w-20rem bg-lime-500">
 				<template #item="{ item }">
 					<router-link
@@ -162,7 +179,7 @@ const items = ref([
 							@click="navigate"
 						>
 							<span :class="[item.icon, 'text-white']" style="font-size: 1.25rem" />
-							<span :class="['ml-2', { 'text-white' : true, 'font-semibold': !isNil(item.items) }]">{{ item.label }}</span>
+							<span :class="['ml-2', 'text-xs', { 'text-white' : true, 'font-semibold': !isNil(item.items) }]">{{ item.label }}</span>
 							<Badge v-if="item.badge" class="ml-auto" :value="item.badge" />
 						</a>
 					</router-link>

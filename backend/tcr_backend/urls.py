@@ -22,5 +22,6 @@ urlpatterns = [
     path('auth/', include('tcr_auth.urls')),
     path('api/members/', include('members.urls')),
     path('api/', include("subscriptions.urls")),
+    path('api/', include("reservations.urls")),
     path("rest-api/", include("rest_framework.urls", namespace="rest_framework")),
 ]

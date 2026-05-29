@@ -1,5 +1,6 @@
 from django.db.models import Model
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -25,6 +26,7 @@ class MemberViewSet(viewsets.ModelViewSet):
 
 
   def get_permissions(self):
+    permission_classes = []
     if self.action == 'list' or self.action == 'retrieve':
       permission_classes = [permissions.IsAuthenticated]
 
@@ -52,7 +54,7 @@ class MemberViewSet(viewsets.ModelViewSet):
 
 
   def create(self, request):
-    # .save() will create the existing 'member' instance
+    #
     serializer = MemberSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 

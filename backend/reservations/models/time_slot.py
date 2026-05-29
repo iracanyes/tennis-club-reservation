@@ -1,7 +1,7 @@
 from django.db import models
 import uuid
 
-from . import Court, CourtEvent
+from . import Court
 
 
 class TimeSlot(models.Model):
@@ -11,10 +11,10 @@ class TimeSlot(models.Model):
     ordering = ['-date', 'start_time', 'end_time']
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  dateCreated = models.DateTimeField(name='date_created')
+  dateCreated = models.DateTimeField(name='date_created', auto_now_add=True)
   date = models.DateField()
-  startTime = models.TimeField(name='start_time')
-  endTime = models.TimeField(name='end_time')
+  start_time = models.TimeField(name='start_time')
+  end_time = models.TimeField(name='end_time')
   status = models.CharField(max_length=100)
 
   court = models.ForeignKey(Court, on_delete=models.CASCADE, related_name='time_slots')
@@ -25,8 +25,8 @@ class TimeSlot(models.Model):
       'id' : {self.id}, 
       'dateCreated' : {self.dateCreated}, 
       'date' : {self.date}, 
-      'startTime' : {self.startTime},
-      'endTime' : {self.endTime},
+      'startTime' : {self.start_time},
+      'endTime' : {self.end_time},
       'status' : {self.status},
       'court': {self.court},     
     }}

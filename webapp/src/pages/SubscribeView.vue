@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import {ref, onMounted, type Ref} from "vue";
-import { useRouter } from "vue-router";
 import { Card, Button, useToast } from "primevue";
 import {APIService} from "@services";
 import ApiRoutes from "@navigation/api.routes.ts";
 import type {Plan} from "../dto";
-
-const router = useRouter();
 const toast = useToast();
 const apiService = APIService.getInstance();
 const plans: Ref<Plan[], Plan[]> = ref([]);

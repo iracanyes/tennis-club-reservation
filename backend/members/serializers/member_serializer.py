@@ -150,3 +150,8 @@ class MemberLoginSerializer(serializers.Serializer):
 
         return data
 
+
+class MemberReservationSerializer(MemberSerializer):
+    class Meta:
+        model = Member
+        fields = ["aft_id", "email", "firstname", "lastname", "gender", "birthdate", "ranks", "categories"]

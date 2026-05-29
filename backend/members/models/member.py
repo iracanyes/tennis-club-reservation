@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.contrib.auth.models import AbstractUser
 
 from members.managers import UserManager
-from . import Address, Category
+from . import Address, Category, Rank
 
 member_aft_number_validator = RegexValidator(
   regex=r'^[0-9]\d{6}$',
@@ -55,6 +55,7 @@ class Member(AbstractUser):
   # to access address's residents : address.residents
   address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='residents')
   categories = models.ManyToManyField(Category, related_name='members')
+  ranks = models.ManyToManyField(Rank, through="MemberRank")
 
 
 

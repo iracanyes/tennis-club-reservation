@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
 	PhAddressBookTabs, PhCalendarDots,
 	PhChartLineUp, PhCurrencyEur,
@@ -8,11 +7,13 @@ import {
 	PhUserCircleCheck,
 	PhUserCirclePlus, PhUserSwitch
 } from "@phosphor-icons/vue";
+import CreateReservationForm from "@components/form/CreateReservationForm.vue";
 </script>
 
 <template>
 	<div class="h-full flex flex-col justify-center items-center bg-amber-400">
-		<h1 class="text-white text-lg font-semibold p-2">Dashboard : Home</h1>
+		<h1 class="text-white text-lg font-semibold p-2">Dashboard : Mes réservations</h1>
+
 
 		<div class="h-full w-full flex flex-row bg-amber-400">
 			<div class="h-full w-3/4 ">
@@ -79,12 +80,10 @@ import {
 
 
 			</div>
-
-			<!-- Main - Sidebar -->
-			<div class="w-1/4 h-full bg-blue-500">
-				<div class="flex flex-col p-2">
+			<div class="w-1/4 h-full bg-blue-500 gap-y-4">
+				<div class="flex flex-col p-2 gap-y-4">
 					<!-- Card -->
-					<div id="home_card_md" class="flex flex-row p-0 justify-between rounded-md border shadow-lg border-emerald-600 bg-emerald-400 ">
+					<div  class="flex flex-row p-0 justify-between rounded-md border shadow-lg border-emerald-600 bg-emerald-400 ">
 						<div class="bg-white-200 p-2 flex justify-center items-center">
 							<PhCurrencyEur :size="42" weight="duotone"/>
 						</div>
@@ -97,11 +96,15 @@ import {
 						</div>
 					</div>
 
-
+					<!-- Create reservation form -->
+					<div>
+						<CreateReservationForm />
+					</div>
 				</div>
 			</div>
 
 		</div>
+
 	</div>
 </template>
 

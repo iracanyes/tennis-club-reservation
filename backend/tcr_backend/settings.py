@@ -182,7 +182,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # CORS Allow credentials
-# 
+#
 CORS_ALLOW_CREDENTIALS = True
 
 
@@ -247,4 +247,35 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_REFRESH_PATH": "/auth/",
     # Enable CSRF Validation
     "AUTH_COOKIE_USE_CSRF": False,
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} \n{message}\n',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',  # Fichier de destination
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
 }

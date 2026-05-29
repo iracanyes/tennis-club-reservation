@@ -3,7 +3,7 @@ from rest_framework import permissions
 
 class IsOwnerOrReadonly(permissions.BasePermission):
     """
-    Object-level permission to only allow owners of an object to edit it.
+    Object-level permission to only allow a member object's owner to edit it.
     """
     def has_object_permission(self, request, view, obj):
         if not request.user.is_authenticated:

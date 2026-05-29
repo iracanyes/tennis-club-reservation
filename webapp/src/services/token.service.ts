@@ -8,7 +8,13 @@ class TokenService {
   // @ts-ignore
   private readonly tokenSaveHandler = watch(this.token, () => this.handleTokenChange(this.token))
 
-  public readonly isAdmin = computed(() => this.token?.type == "admin");
+  public readonly isAdmin = computed(() => {
+    console.log("TokenService.isAdmin");
+    console.log(`TokenService.isAdmin - this.token.type  : ${this.token.type}`);
+    console.log(this.token);
+
+    return this.token.type === "admin";
+  });
 
   public readonly authenticated = computed(() => !isNil(this.token?.token));
 
@@ -32,6 +38,8 @@ class TokenService {
 
   }
 
+
+
   private getToken() : Token {
     const token = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY);
 
@@ -53,6 +61,7 @@ class TokenService {
       localStorage.removeItem(import.meta.env.VITE_TOKEN_KEY);
     }
   }
+
 
 
 }

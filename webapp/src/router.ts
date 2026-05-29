@@ -1,6 +1,7 @@
-import { createWebHistory, createRouter } from "vue-router";
-import { DashboardLayout } from "@layouts";
+import {createRouter, createWebHistory} from "vue-router";
+import {DashboardLayout} from "@layouts";
 import {isNil} from "lodash";
+import AppRoutes from "@navigation/app.routes.ts";
 
 // Define routes
 const routes = [
@@ -10,12 +11,12 @@ const routes = [
   { path: "/admin/sign-in", redirect: "/admin/login/" },
   { path: "/admin/login", redirect: "/admin/login/" },
   {
-    path: "/login",
+    path: AppRoutes.Login,
     component : () => import("@components/security/LoginView.vue"),
     name: "login"
   },
   {
-    path: "/admin/login/",
+    path: AppRoutes.AdminLogin,
     component: () => import("@components/security/AdminLoginView.vue"),
     name: "admin-login"
   },
@@ -24,7 +25,7 @@ const routes = [
     component: DashboardLayout,
     children: [
       {
-        path: "/home",
+        path: AppRoutes.DashboardHome,
         component: () => import("@pages/HomeView.vue"),
         name: "home",
         meta: {
@@ -32,15 +33,16 @@ const routes = [
         }
       },
       {
-        path: "/admin",
+        path: AppRoutes.DashboardAdmin,
         component: () => import("@pages/DashboardHome.vue"),
         name: "admin_home",
         meta: {
-          requiresAuth: true
+          requiresAuth: true,
+          requiresAdmin: true
         }
       },
       {
-        path: "/profile/change_password",
+        path: AppRoutes.ProfileChangePassword,
         component: () => import("@components/security/ChangePasswordView.vue"),
         name: "change_password",
         meta: {
@@ -48,7 +50,7 @@ const routes = [
         }
       },
       {
-        path: "/subscribe",
+        path: AppRoutes.Subscribe,
         component: () => import("@pages/SubscribeView.vue"),
         name: "subscribe",
         meta: {
@@ -65,10 +67,18 @@ const routes = [
       },
       {
         path: "/subscribe/payment/cancel",
-        component: () => import("@pages/StripeCheckoutSessionSuccessView.vue"),
+        component: () => import("@pages/StripeCheckoutSessionCancelView.vue"),
         name: "stripe_checkout_cancel",
         meta: {
           requiresAuth: false
+        }
+      },
+      {
+        path: "/reservations/me",
+        component: () => import("@pages/MyReservationsView.vue"),
+        name: "my_reservations",
+        meta: {
+          requiresAuth: true
         }
       }
     ]
@@ -89,6 +99,7 @@ const router = createRouter({
 //@ts-ignore
 router.beforeEach((to, from) => {
   const tokenString = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY);
+  const token = isNil(tokenString) ? null : JSON.parse(tokenString);
 
   console.log(`router.beforeEach - to.path : ${to.path}`);
   if(to.path.startsWith("http")){
@@ -99,15 +110,23 @@ router.beforeEach((to, from) => {
   // all routes are private except authentication routes
   if(to.meta?.requiresAuth) {
     console.log(`router.beforeEach - to.meta.requiresAuth : ${(to.meta.requiresAuth as boolean)}`);
-
+    // Redirect to login allowed
     if(to.path.includes("login")) return true;
 
-    if(!isNil(tokenString) && JSON.parse(tokenString).token.length > 0){
+    if(!isNil(token) && token.token.length > 0){
       console.log(`router.beforeEach - !isNil(tokenString) && JSON.parse(tokenString).token.length > 0 : ${!isNil(tokenString) && JSON.parse(tokenString).token.length > 0}`);
-      return true;
+      if(to.meta?.requiresAdmin && token.type === "admin") return true;
+
+      return ["member", "admin"].includes(token.type);
+
     }else{
       console.log(`router.beforeEach - !(!isNil(tokenString) && JSON.parse(tokenString).token.length > 0) : REDIRECT TO LOGIN`);
-      return {name: 'login'};
+      if(to.meta?.requiresAdmin){
+        return {name: 'admin-login'};
+      }else {
+        return {name: 'login'};
+      }
+
     }
   }
 

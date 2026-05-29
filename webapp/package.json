@@ -9,8 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@phosphor-icons/vue": "^2.2.1",
     "@primeuix/themes": "^2.0.3",
     "@stripe/stripe-js": "^9.5.0",
+    "@tabler/icons-vue": "^3.44.0",
     "@tailwindcss/vite": "^4.2.4",
     "cookie": "^1.1.1",
     "feather-icons": "^4.29.2",

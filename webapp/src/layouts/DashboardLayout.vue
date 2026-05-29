@@ -11,9 +11,9 @@ import { Toast } from "primevue";
 			<SidebarLeftNav />
 		</aside>
 		<section class="h-full flex-1 bg-red-500">
-			<header class="h-10 bg-lime-50 flex flex-row">
+			<header class="h-12 bg-lime-50 flex flex-row">
 				<div class="w-1/3 flex bg-red-400"></div>
-				<div class="w-1/3 flex bg-yellow-400"></div>
+				<div class="w-1/3 flex-1 bg-yellow-400"></div>
 				<div class="w-1/3 flex bg-lime-400 p-2 justify-end">
 					<LogoutButton
 						type="button"

@@ -292,6 +292,7 @@ Allow to django configuration and settings.
 ````shell
 $ cd /path/to/django_project
 $ source .venv/Scripts/activate
+
 (.venv)
 $ pyhton manage.py shell
 ````

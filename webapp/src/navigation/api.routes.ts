@@ -12,6 +12,8 @@ const ApiRoutes = {
   MemberList : '/api/members',
   StripeCheckoutSession : '/api/payment/checkout_session',
   PlanList: '/api/plans',
+  CourtList: '/api/courts',
+  CreateReservation : '/api/reservations/',
 } as const
 
 export default ApiRoutes

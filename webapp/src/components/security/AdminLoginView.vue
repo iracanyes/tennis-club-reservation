@@ -21,6 +21,7 @@ onMounted(() => {
 	}
 })
 
+// Local connection using email
 async function submit(e : Event){
   // Prevent default form behavior on submit
 	e.preventDefault();
@@ -28,16 +29,16 @@ async function submit(e : Event){
   try{
     let response = await apiService.post(ApiRoutes.AdminLogin, { email: email.value, password: password.value });
 
-    if(response.token){
+    if(response.data){
       // Set access token
-			tokenService.setToken(response);
+			tokenService.setToken(response.data);
 
 			// CSRF Token has been rotated on login. Delete CSRF Token
 			csrfTokenService.deleteToken();
 
       // Redirect to dashboard
       await router.push({
-        name: 'dashboard',
+        name: 'admin_home',
       });
     }
 
@@ -56,7 +57,6 @@ async function submit(e : Event){
 }
 
 // Google Sign-in
-
 const initGoogleSignIn = () => {
 	console.log('initGoogleSignIn');
 
@@ -112,11 +112,11 @@ const initGoogleSignIn = () => {
 
   <main class="h-full flex">
     <div class="flex-auto w-1/2 min-h-full bg-yellow-600 ">
-      <img src="/src/assets/tennis_smash.webp" alt="logo" class="w-3xl h-full"></img>
+      <img src="/src/assets/img/tennis_smash.webp" alt="logo" class="w-3xl h-full"></img>
     </div>
     <div class="flex-auto w-1/2 min-h-full flex-col justify-center bg-yellow-600 px-6 py-15 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm justify-center">
-        <img src="/src/assets/tsc_logo.png" alt="Your Company" class="mx-auto h-10 w-auto" />
+        <img src="/src/assets/img/tsc_logo.png" alt="Your Company" class="mx-auto h-10 w-auto" />
         <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
           Tennis Club - Réservations
         </h2>
@@ -183,7 +183,7 @@ const initGoogleSignIn = () => {
             </p>
           </div>
         </form>
-				<div id="google-sign-in-button" class="mt-10">
+				<div id="google-sign-in-button" class="mt-10 flex justify-center">
 				</div>
       </div>
     </div>

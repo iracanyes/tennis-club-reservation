@@ -1,0 +1,1 @@
+from .is_author_or_admin_or_readonly import IsAuthorOrAdminOrReadOnly

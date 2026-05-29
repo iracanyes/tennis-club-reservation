@@ -2,7 +2,7 @@
 import ApiRoutes from "@navigation/api.routes.ts";
 import ApiService from "@services/api.service.ts";
 import { useRouter } from "vue-router";
-import {TokenService} from "@services";
+import { TokenService } from "@services";
 import { Button } from "primevue";
 
 defineProps({
@@ -37,9 +37,11 @@ const logout = async () => {
 		:label="buttonText"
 		icon="pi pi-sign-out"
 		@click="logout"
-		severity="danger"
+		severity="warn"
+		aria-label="Se déconnecter"
+		rounded
 		raised
-		class="text-sm p-2 border-1 rounded-sm"
+		:class="['text-sm', 'p-2', 'border-2', 'rounded-sm']"
 	/>
 </template>
 

@@ -1,4 +1,6 @@
 import os
+import logging
+from django.conf import settings
 from datetime import datetime
 from rest_framework import status
 from rest_framework.exceptions import APIException
@@ -10,14 +12,18 @@ from subscriptions.models import Payment, Subscription, Plan
 
 class StripeService:
     Instance = None
+    __logger = logging.getLogger(__name__)
 
     def __init__(self):
-        if os.environ.get("STRIPE_READ_PAYMENT_KEY") is None:
+        stripe_read_payment_key = os.environ.get("STRIPE_READ_PAYMENT_KEY")
+        if stripe_read_payment_key is None:
             raise APIException("Stripe secret key not set")
 
-        self.client = StripeClient(os.environ.get("STRIPE_READ_PAYMENT_KEY"))
+        self.client = StripeClient(stripe_read_payment_key)
 
-   # Singleton pattern
+    # Singleton pattern
+    # __new__ method allow to define the constructor method
+    # Usage : a = StripeService() return the same instance
     def __new__(cls):
         if cls.Instance is None:
             cls.Instance = super().__new__(cls)
@@ -36,18 +42,20 @@ class StripeService:
 
         # TODO: Make sure fulfillment hasn't already been
         # performed for this Checkout Session
-        print(f"FulFilling Checkout session - id : {session_id}")
+        if settings.DEBUG :
+            self.__logger.warning(f"FulFilling Checkout session - id : {session_id}")
 
         try:
             payment = Payment.objects.get(checkout_session_id=session_id)
 
-            print(f"FulFilling Checkout session - payment : {payment}")
+            if settings.DEBUG :
+                self.__logger.warning(f"FulFilling Checkout session - payment : {payment}")
 
             # If a payment is already registered for the checkout session, return OK
             if payment is not None and payment.payment_status in ['paid']:
                 return Response(status=status.HTTP_200_OK)
         except Payment.DoesNotExist as e:
-            print(f"FulFilling Checkout session - retrieve payment exception : \n{e}")
+                self.__logger.error(f"FulFilling Checkout session - retrieve payment exception : \n{e}\n")
 
         # Retrieve the Checkout Session from the Stripe API with line_items expanded
         checkout_session = self.client.v1.checkout.sessions.retrieve(
@@ -109,6 +117,7 @@ class StripeService:
                 member.annualFeePaid = True
                 member.save()
             except Exception as e:
+                self.__logger.error(f"StripeService.fulfill_checkout failed : \n{e}")
                 raise APIException(f"StripeService.fulfill_checkout failed :- \n{e}")
 
             return Response(status=status.HTTP_200_OK)

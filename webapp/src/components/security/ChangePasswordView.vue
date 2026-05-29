@@ -48,7 +48,7 @@ const submit = async (e: Event) => {
 <template>
 	<div class="flex-auto w-full min-h-full flex-col justify-center bg-yellow-600 px-6 py-15 lg:px-8">
 		<div class="sm:mx-auto sm:w-full sm:max-w-sm justify-center">
-			<img src="/src/assets/tsc_logo.png" alt="Your Company" class="mx-auto h-10 w-auto" />
+			<img src="/src/assets/img/tsc_logo.png" alt="Your Company" class="mx-auto h-10 w-auto" />
 			<h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
 				Profil - Changer mot de passe
 			</h2>

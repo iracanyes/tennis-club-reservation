@@ -5,10 +5,10 @@ import { router } from "../router.ts";
 </script>
 
 <template>
-	<div class="flex justify-center align-center">
+	<div class="h-full flex justify-center items-center">
 		<Card>
 			<template #title>
-				<span>La transaction a été interrompue, une erreur est survenue</span>
+				<span>La transaction a été interrompue.</span>
 			</template>
 			<template #content>
 				<p class="m-0">
@@ -18,7 +18,7 @@ import { router } from "../router.ts";
 			</template>
 			<template #footer>
 				<div class="flex gap-4 mt-1">
-					<Button label="Ajouter une réservation" class="w-full"  @click.prevent="router.push({ name : 'add_reservation'})"/>
+					<Button label="S'abonner" class="w-full"  @click.prevent="router.push({ name : 'subscribe'})"/>
 					<Button label="Retour au dashboard" class="w-full" @click.prevent="router.push({ name : 'home'})"/>
 				</div>
 			</template>

@@ -22,6 +22,8 @@ export default defineConfig({
       '@navigation':  path.resolve(__dirname, './src/navigation'),
       '@services':  path.resolve(__dirname, './src/services'),
       '@assets':  path.resolve(__dirname, './src/assets'),
+      '@dto':  path.resolve(__dirname, './src/dto'),
+      '@enums':  path.resolve(__dirname, './src/enums'),
 
     }
   },
