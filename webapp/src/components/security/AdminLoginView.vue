@@ -31,15 +31,21 @@ async function submit(e : Event){
 
     if(response.data){
       // Set access token
-			tokenService.setToken(response.data);
+			await tokenService.setToken(response.data);
 
 			// CSRF Token has been rotated on login. Delete CSRF Token
 			csrfTokenService.deleteToken();
 
       // Redirect to dashboard
-      await router.push({
-        name: 'admin_home',
-      });
+			// Redirect to dashboard
+			if(typeof router.options.history.state.back === "string" ){
+				router.push((router.options.history.state.back as string));
+			}else{
+				router.push({
+					name: 'admin_home',
+				});
+			}
+
     }
 
   }catch (e: any) {

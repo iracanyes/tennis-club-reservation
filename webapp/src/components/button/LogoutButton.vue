@@ -22,7 +22,7 @@ const logout = async () => {
 
 		tokenService.setToken(null);
 
-		await router.push({ name: "login"});
+		await router.push({ name: "login" });
 	}catch (e: any) {
 		console.log(e.message)
 

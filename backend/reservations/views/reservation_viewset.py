@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.http import QueryDict
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -109,3 +110,15 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['GET'], detail=False)
+    def me(self, request):
+        """
+        Get authenticated user's reservations
+        """
+        serializer = self.serializer_class(self.queryset.filter(author=request.user), many=True)
+
+        return Response(serializer.data)
+
+
+

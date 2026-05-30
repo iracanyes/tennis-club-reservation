@@ -19,6 +19,7 @@ import type { Court, Member, Reservation } from "@dto/index.ts";
 import { ReservationDurationEnum, ReservationStartTime } from "@enums/index.ts";
 import {isEmpty, isNil} from "lodash";
 import {TokenService} from "@services";
+import {formatISO} from "date-fns";
 
 const router = useRouter();
 const toast = useToast();
@@ -108,7 +109,10 @@ const onSubmit = async (e: Event) => {
 	}
 
 
-	if(isNil(dateReservation.value) || isNil(start_time.value) || new Date((dateReservation.value.toISOString().substring(0,10) + "T" + start_time.value.str)).getTime() < Date.now()){
+	if(isNil(dateReservation.value)
+		|| isNil(start_time.value)
+		|| new Date((formatISO(dateReservation.value, { representation: "date" }) + "T" + start_time.value.str)).getTime() < Date.now()
+	){
 		toast.add({
 			severity: "error",
 			summary: "Please select a reservation's date greater or equal to today.",
@@ -136,7 +140,7 @@ const onSubmit = async (e: Event) => {
 	}
 
 	const payload = {
-		date_reservation: dateReservation.value.toISOString().substring(0,10),
+		date_reservation: formatISO(dateReservation.value, { representation: "date"}),
 		start_time: start_time.value.str,
 		duration: duration.value,
 		is_double: isDouble.value,
@@ -158,7 +162,7 @@ const onSubmit = async (e: Event) => {
 				life: 5000
 			});
 
-			await router.push({ name : "my_reservations"});
+			router.go(0);
 		}
 
 

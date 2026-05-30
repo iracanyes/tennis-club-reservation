@@ -254,7 +254,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} \n{message}\n',
+            'format': '{levelname} {asctime} {module} {funcName} : \n{filename} \n{message}\n',
             'style': '{',
         },
     },

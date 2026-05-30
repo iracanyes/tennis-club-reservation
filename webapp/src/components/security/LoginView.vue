@@ -22,7 +22,7 @@ async function submit(e : Event){
 
 		console.log(`submit - response : ${JSON.stringify(response)}`)
     if(response.token && response.token !== ""){
-      tokenService.setToken(response);
+      await tokenService.setToken(response);
 
 			// CSRF Token has been rotated on login. Delete CSRF Token
 			csrfTokenService.deleteToken();
@@ -31,9 +31,9 @@ async function submit(e : Event){
 
       // Redirect to dashboard
 			if(typeof router.options.history.state.back === "string" ){
-				await router.push((router.options.history.state.back as string));
+				router.push((router.options.history.state.back as string));
 			}else{
-				await router.push({
+				router.push({
 					name: 'home',
 				});
 			}

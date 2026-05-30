@@ -1,4 +1,4 @@
-import {computed, reactive, watch} from "vue";
+import {computed, reactive, watch, nextTick } from "vue";
 import { isNil } from "lodash";
 import  { type Token } from "@types"
 
@@ -25,16 +25,22 @@ class TokenService {
     return TokenService.instance;
   }
 
-  setToken(token: Token|null) {
+  async setToken(token: Token|null) {
 
-    if(token && token.token.trim().length > 0){
+    if(!isNil(token) && token.token.trim().length > 0){
       this.token.token = token.token;
       this.token.type = token.type;
+
+
+
     }else{
       this.token.token = "";
       this.token.type = "";
       localStorage.removeItem(import.meta.env.VITE_TOKEN_KEY);
     }
+
+    // Déclencher la propagation des modifications
+    await nextTick();
 
   }
 

@@ -14,6 +14,8 @@ const ApiRoutes = {
   PlanList: '/api/plans',
   CourtList: '/api/courts',
   CreateReservation : '/api/reservations/',
+  MyReservations: '/api/reservations/me/',
+  DeleteReservation : '/api/reservations/',
 } as const
 
 export default ApiRoutes

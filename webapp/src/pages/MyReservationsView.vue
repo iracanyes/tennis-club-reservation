@@ -8,11 +8,12 @@ import {
 	PhUserCirclePlus, PhUserSwitch
 } from "@phosphor-icons/vue";
 import CreateReservationForm from "@components/form/CreateReservationForm.vue";
+import MyReservationsTableView from "@components/table/MyReservationsTableView.vue";
 </script>
 
 <template>
-	<div class="h-full flex flex-col justify-center items-center bg-amber-400">
-		<h1 class="text-white text-lg font-semibold p-2">Dashboard : Mes réservations</h1>
+	<div class="h-full flex flex-col bg-amber-400">
+		<h1 class="text-white text-lg font-semibold text-center p-2">Dashboard : Mes réservations</h1>
 
 
 		<div class="h-full w-full flex flex-row bg-amber-400">
@@ -76,7 +77,10 @@ import CreateReservationForm from "@components/form/CreateReservationForm.vue";
 					</div>
 				</div>
 
-				<!-- -->
+				<!-- member's reservations list  -->
+				<div class="card flex">
+					<MyReservationsTableView />
+				</div>
 
 
 			</div>
@@ -96,8 +100,9 @@ import CreateReservationForm from "@components/form/CreateReservationForm.vue";
 						</div>
 					</div>
 
-					<!-- Create reservation form -->
+
 					<div>
+						<!-- Create reservation form -->
 						<CreateReservationForm />
 					</div>
 				</div>

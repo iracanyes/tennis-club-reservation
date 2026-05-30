@@ -2,7 +2,8 @@ import CSRFService from "./csrf.service.ts";
 import {isNil} from "lodash";
 import CookieService from "./cookie.service.ts";
 import {useRouter} from "vue-router";
-import tokenService from "@services/token.service.ts";
+import { useToast } from "primevue";
+import TokenService from "@services/token.service.ts";
 
 
 class APIService {
@@ -10,6 +11,8 @@ class APIService {
   private readonly baseUrl: string = import.meta.env.VITE_API_URL;
   private readonly csrfService: CSRFService = CSRFService.getInstance();
   private readonly cookieService : CookieService = CookieService.getInstance();
+  private readonly tokenService : TokenService = TokenService.getInstance();
+  private readonly toast  = useToast();
   private readonly router = useRouter();
 
   private constructor() {}
@@ -50,18 +53,28 @@ class APIService {
         }
       );
 
+      console.log("ApiService.post - response", response);
+
       if(response.status === 401){
         if(localStorage.getItem('access_token')){
-          tokenService.getInstance().setToken(null);
+          this.tokenService.setToken(null);
         }
         await this.router.push({ name : 'login' });
       }
 
       if(!response.ok){
+        const result = await response.json();
+        if(result.message){
+          this.toast.add({
+            severity: 'error',
+            summary: "Error while posting to " + urlPath,
+            detail: result.message,
+            life: 5000
+          });
+        }
+        console.log("ApiService.post - response", result);
         throw new Error(`${response.status} : ${response.statusText}`);
       }
-
-
 
       return await response.json();
     }catch (e) {
@@ -89,7 +102,7 @@ class APIService {
 
       if(response.status === 401){
         if(localStorage.getItem('access_token')){
-          tokenService.getInstance().setToken(null);
+          this.tokenService.setToken(null);
         }
         await this.router.push({ name : 'login' });
       }
@@ -108,6 +121,8 @@ class APIService {
   }
 
   public async put(urlPath: string, payload: any): Promise<any> {
+    urlPath = urlPath.endsWith("/") ? urlPath : `${urlPath}/`;
+
     try{
       const response = await fetch(urlPath, {
         method: 'PUT',
@@ -125,6 +140,60 @@ class APIService {
     }catch (e) {
       console.error(e);
     }
+  }
+
+  /**
+   * API Service delete method
+   * @param urlPath
+   * @param payload
+   */
+  public async delete(urlPath: string, payload : any = null): Promise<any> {
+    let csrf_token = await this.csrfService.getToken();
+
+    urlPath = urlPath.endsWith("/") ? urlPath : `${urlPath}/`;
+
+    if(isNil(csrf_token) || csrf_token.length === 0) {
+      throw new Error(`csrf_token is not a valid token`);
+    }
+
+    try {
+      const response = await fetch(this.baseUrl + urlPath, {
+        method: 'DELETE',
+        mode: 'cors',
+        cache: 'default',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if(response.status === 401){
+        if(localStorage.getItem('access_token')){
+          this.tokenService.setToken(null);
+        }
+        await this.router.push({ name : 'login' });
+      }
+
+      if(!response.ok){
+        throw new Error(`${response.status} : ${response.statusText}`);
+      }
+
+      this.toast.add({
+        severity: 'success',
+        summary: "Successfully deleted ",
+      });
+
+      return true;
+    }catch (e) {
+      console.error("ApiService.delete() - errors : ",e);
+      this.toast.add({
+        severity: 'error',
+        summary: "Error while deleting an object",
+      })
+    }
+
+    throw new Error(`Unable to delete to ${urlPath}`);
   }
 }
 
