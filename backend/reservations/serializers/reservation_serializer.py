@@ -9,6 +9,7 @@ from members.serializers import MemberReservationSerializer
 from members.models import Member
 from reservations.models import Court, Reservation, TimeSlot
 from reservations.serializers import CourtSerializer
+from reservations.validators import ReservationValidator
 
 
 class ReservationSerializer(serializers.ModelSerializer):
@@ -24,12 +25,13 @@ class ReservationSerializer(serializers.ModelSerializer):
             "id",
             "date_created",
             "date_modified",
+            "event_type",
+            "reason",
             "date_reservation",
             "start_time",
             "duration",
             "is_double",
             "status",
-            "event_type",
             "court",
             "author",
             "participants"
@@ -40,23 +42,16 @@ class ReservationSerializer(serializers.ModelSerializer):
         if settings.DEBUG :
             self.__logger.warning(f"ReservationSerializer.validate - data: {data}")
 
-        #author = Member.objects.get(id=data['author']['id'])
-
         if not data['author'] :
             raise serializers.ValidationError({'message': 'Author not found.'})
-
-        #court = Court.objects.get(id=data['court']['id'])
 
         if not data['court'] :
             raise serializers.ValidationError({'message': 'Court not found.'})
 
-        # participants = []
-        # for participant in data['participants']:
-        #     participants.append(Member.objects.get(id=participant['id']))
-        #
-        # data['participants'] = participants
-        # data['author'] = author
-        # data['court'] = court
+        status_choices = [status_choice.value for status_choice in Reservation.StatusChoices]
+
+        if not data["status"] in status_choices:
+            raise serializers.ValidationError({'message': f'Status must be one of [{", ".join(status_choices)}] .'})
 
         return data
 
@@ -66,83 +61,20 @@ class ReservationSerializer(serializers.ModelSerializer):
             self.__logger.warning(f"ReservationSerializer.create - validated_data: {validated_data}")
 
         # Check opening hour
-        if validated_data["start_time"] < time(9,0):
-            raise serializers.ValidationError({ "message" : "The club reservation only open at 09:00 AM."})
-
+        ReservationValidator.check_opening_hour(validated_data)
 
         # Check closing hour
-        if validated_data['start_time'] > time(18, 0) :
-            if validated_data["duration"] == Reservation.DurationChoices.FOUR_HOURS:
-                raise serializers.ValidationError({'message': 'Reservation end time exceed closing hour 22h.'})
+        ReservationValidator.check_closing_hour(validated_data)
 
-            if validated_data['start_time'] > time(20, 0):
-                if validated_data['duration'] > Reservation.DurationChoices.TWO_HOURS:
-                    raise serializers.ValidationError({'message': 'Reservation end time exceed closing hour 22h.'})
-
-                if validated_data['start_time'] > time(21, 0):
-                    if validated_data["duration"] > Reservation.DurationChoices.ONE_HOUR:
-                        raise serializers.ValidationError({'message': 'Reservation end time exceed closing hour 22h.'})
-
-
-
-        #
-        if(validated_data['is_double']):
-
-            # Check if no reservation for this date and timeslot exists,
-            reservationExists = Reservation.objects.filter(
-                date_reservation=validated_data['date_reservation'],
-                start_time__range=(validated_data['start_time'], (datetime.combine(date.today(), validated_data['start_time']) + timedelta(hours=1)).time()),
-                court__id=validated_data["court"].id
-            ).exists()
-        else:
-
-            # Check if no reservation for this date and timeslot exists,
-            reservationExists = Reservation.objects.filter(
-                date_reservation=validated_data['date_reservation'],
-                start_time=validated_data['start_time']
-            ).exists()
-
-        if reservationExists:
-            raise serializers.ValidationError({'message': 'Reservation already exists for this date and time on this court.'})
+        # Check if no reservation for this date and timeslot exists,
+        ReservationValidator.check_reservation_already_exists(validated_data)
 
         # TODO: Checks for max week reservation by member. Week start on sunday -> saturday
         # 1. Max 2 hours of simple reservation by week
         # 2. Max 4 hours of double reservation by week
-
-        last_sunday = validated_data['date_reservation'] + relativedelta(weekday=SU(-1))
-        next_saturday = validated_data['date_reservation'] + relativedelta(weekday=SA(1))
-
-        if settings.DEBUG :
-            self.__logger.debug(f"ReservationSerializer.create - validated_dataauthor__id=validated_data['author'] : {validated_data['author']}")
-
-        # Check last member's reservation for this week
-        memberReservations = Reservation.objects.filter(
-            author__id=validated_data['author'].id,
-            date_reservation__range=(last_sunday, next_saturday),
-        )
-
-        if memberReservations.count() == 2 :
-            raise APIException({'message': 'Member has reached the max number of reservations for this week.'})
-
-        memberReservation = memberReservations.first()
+        ReservationValidator.check_reservation_limit_by_week(validated_data)
 
 
-
-        # 3. One hour of simple ou two hours of double
-        if validated_data['is_double']:
-            if memberReservation is not None :
-                if not memberReservation.is_double :
-                    raise APIException({'message': 'Member has already a simple reservation booked for this week.'})
-                # Check if the first reservation reach max hours for double reservation
-                if memberReservation.duration == Reservation.DurationChoices.FOUR_HOURS :
-                    raise APIException({"message" : "Member has reached the max number of double reservation for this week."})
-        else:
-            if memberReservation is not None:
-                if memberReservation.is_double :
-                    raise APIException({ 'message' : 'Member has already a double reservation booked for this week.'})
-                # Check if first reservation doesn't reach max hours for simple reservation
-                if memberReservation.duration == Reservation.DurationChoices.TWO_HOURS :
-                    raise APIException({ "message" : "Member has reached the max number of simple reservation for this week." })
 
         # event type input
         if validated_data['event_type'] ==  Reservation.EventTypeChoices.EVENT and validated_data["author"].is_staff :
@@ -157,6 +89,8 @@ class ReservationSerializer(serializers.ModelSerializer):
                 duration = Reservation.DurationChoices.ONE_HOUR
             case Reservation.DurationChoices.TWO_HOURS:
                 duration = Reservation.DurationChoices.TWO_HOURS
+            case Reservation.DurationChoices.FOUR_HOURS:
+                duration = Reservation.DurationChoices.FOUR_HOURS
             case Reservation.DurationChoices.ONE_DAY:
                 duration = Reservation.DurationChoices.ONE_DAY
 
@@ -195,7 +129,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             date=validated_data['date_reservation'],
             start_time=validated_data['start_time'],
             end_time=endTime,
-            status=Reservation.StatusChoices.ACTIVE,
+            status=TimeSlot.StatusChoices.RESERVED,
             court=validated_data['court'],
         )
 

@@ -1,2 +1,3 @@
 from .court_serializer import CourtSerializer
 from .reservation_serializer import ReservationSerializer, ReservationDeleteSerializer
+from .event_serializer import EventSerializer

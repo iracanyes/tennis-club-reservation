@@ -35,3 +35,4 @@ class CourtSerializer(serializers.ModelSerializer):
             raise exceptions.ValidationError("Court does not exist")
 
         return instance
+

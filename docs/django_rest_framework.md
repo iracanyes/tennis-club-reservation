@@ -7,7 +7,7 @@
 ``DefaultRouter``: Crée les URLs CRUD classiques et une page d'accueil de l'API (Browsable API) répertoriant tous les endpoints
 ````python from django.urls import path, re_path, include
 # members.urls.py
-rom rest_framework.routers import DefaultRouter
+from rest_framework.routers import DefaultRouter
 from .views import MemberViewSet
 
 router = DefaultRouter()

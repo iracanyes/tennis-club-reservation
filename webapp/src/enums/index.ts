@@ -1,4 +1,9 @@
 import ReservationDurationEnum from "./ReservationDurationEnum.ts";
-import ReservationStartTime from "./ReservationStartTime.ts";
+import EventReasonEnum from "./EventReasonEnum.ts";
 
-export { ReservationDurationEnum, ReservationStartTime };
+export {type ReservationStartTimeType, ReservationStartTime} from "./ReservationStartTime.ts";
+export {type ReservationTypeEnumType, ReservationTypeEnum} from "./ReservationTypeEnum.ts";
+export {
+  ReservationDurationEnum,
+  EventReasonEnum,
+};

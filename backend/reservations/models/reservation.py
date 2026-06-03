@@ -29,7 +29,7 @@ class Reservation(models.Model):
     ONE_HOUR = 1, _("One hour")
     TWO_HOURS = 2, _("Two hours")
     FOUR_HOURS = 4, _("Four hours")
-    ONE_DAY = 24, _("One day")
+    ONE_DAY = 13, _("One day")
 
   class StatusChoices(models.TextChoices):
     ACTIVE = 'active', _("Active")
@@ -37,7 +37,13 @@ class Reservation(models.Model):
     CANCELED = 'canceled', _("Canceled")
     UNCOMPLETED = 'uncompleted', _("Uncompleted")
 
-
+  class LockReasonChoices(models.TextChoices):
+    CLUB_RESERVATION = 'club_reservation', _('Club Reservation')
+    INTERCLUBS = 'interclubs', _('Interclubs')
+    CHAMPIONSHIP = 'championship', _('Championnat')
+    COMPETITION = 'competition', _('Compétition')
+    LESSON = 'lesson', _('Cours')
+    RENOVATION = 'renovation', _('Rénovation')
 
 
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -49,6 +55,7 @@ class Reservation(models.Model):
   status = models.CharField(max_length=255, choices=StatusChoices, default=StatusChoices.ACTIVE)
   is_double = models.BooleanField(name='is_double', default=False)
   event_type = models.CharField(max_length=50, choices=EventTypeChoices, default=EventTypeChoices.UNKNOWN)
+  reason = models.CharField(max_length=255, choices=LockReasonChoices, default=LockReasonChoices.CLUB_RESERVATION)
 
   author = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='reservations')
   court = models.ForeignKey(Court, on_delete=models.CASCADE, related_name='reservations')
@@ -57,9 +64,11 @@ class Reservation(models.Model):
   def __str__(self):
     return f"""Reservation{{ 
       'id' : {self.id}, 
-      'event_type' : {self.event_type}, 
       'date_created' : {self.date_created}, 
       'date_modified' : {self.date_modified},
+      'event_type' : {self.event_type}, 
+      'reason' : {self.reason},
+      'reason' : {self.reason},      
       'date_reservation' : {self.date_reservation},
       'duration' : {self.duration}, 
       'start_time' : {self.start_time},

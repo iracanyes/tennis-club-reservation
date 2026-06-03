@@ -45,14 +45,18 @@ class ReservationViewSet(viewsets.ModelViewSet):
             self.__logger.warning(f"\nReservationViewSet.create() - request.body : \n{request.body} ")
             self.__logger.warning(f"\nReservationViewSet.create() - request.user :\n {request.user} ")
 
+
+        # Enable mutability on immutable QueryDict
+        if isinstance(request.data, QueryDict):
+            request.data._mutable = True
         # Member can only author their reservation
+        # Set authenticated member as reservation's author
+        request.data["author"] = str(request.user.id)
+
+        # Member are allowed to create only club reservations
         if not request.user.is_staff :
-            # Enable mutability on immutable QueryDict
-            if isinstance(request.data, QueryDict) :
-                request.data._mutable = True
-            # Set authenticated member as reservation's author
-            request.data["author"] = str(request.user.id)
             request.data['event_type'] = Reservation.EventTypeChoices.CLUB_RESERVATION
+
 
         if settings.DEBUG :
             self.__logger.warning(f"ReservationViewSet.create() - request.data : {request.data} ")
@@ -62,7 +66,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
         serializer.save()
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
     def update(self, request, pk=None):
@@ -116,7 +120,8 @@ class ReservationViewSet(viewsets.ModelViewSet):
         """
         Get authenticated user's reservations
         """
-        serializer = self.serializer_class(self.queryset.filter(author=request.user), many=True)
+        # We exclude all event created by Admin member
+        serializer = self.serializer_class(self.queryset.filter(author=request.user).exclude(event_type=Reservation.EventTypeChoices.EVENT), many=True)
 
         return Response(serializer.data)
 

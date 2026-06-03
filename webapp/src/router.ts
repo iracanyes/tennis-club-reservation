@@ -34,7 +34,7 @@ const routes = [
       },
       {
         path: AppRoutes.DashboardAdmin,
-        component: () => import("@pages/DashboardHome.vue"),
+        component: () => import("@pages/AdminHomeView.vue"),
         name: "admin_home",
         meta: {
           requiresAuth: true,
@@ -80,6 +80,15 @@ const routes = [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: "/events",
+        component: () => import("@pages/EventsView.vue"),
+        name: "events",
+        meta: {
+          requiresAuth: true,
+          requiresAdmin: true
+        }
       }
     ]
   },
@@ -115,7 +124,8 @@ router.beforeEach((to, from) => {
 
     if(!isNil(token) && token.token.length > 0){
       console.log(`router.beforeEach - !isNil(tokenString) && JSON.parse(tokenString).token.length > 0 : ${!isNil(tokenString) && JSON.parse(tokenString).token.length > 0}`);
-      if(to.meta?.requiresAdmin && token.type === "admin") return true;
+      // If admin's route and user not admin, redirect to admin login page
+      if(to.meta?.requiresAdmin && token.type !== "admin") return { name : "admin-login"};
 
       return ["member", "admin"].includes(token.type);
 
@@ -124,6 +134,7 @@ router.beforeEach((to, from) => {
       if(to.meta?.requiresAdmin){
         return {name: 'admin-login'};
       }else {
+        // all pages are restricted, redirect to member login
         return {name: 'login'};
       }
 

@@ -18,9 +18,11 @@ import ApiService from "@services/api.service.ts";
 import type { Court, Member, Reservation } from "@dto/index.ts";
 import {
 	ReservationDurationEnum,
+	EventReasonEnum,
 	ReservationStartTime,
 	type ReservationStartTimeType,
-	ReservationTypeEnum, type ReservationTypeEnumType
+	ReservationTypeEnum,
+	type ReservationTypeEnumType
 } from "@enums/index.ts";
 import {isEmpty, isNil} from "lodash";
 import {TokenService} from "@services";
@@ -37,14 +39,15 @@ const members : Ref<Member[]> = ref([]);
 const court : Ref<Court | null> = ref(null);
 const dateReservation : Ref<Date | null>  = ref(null);
 const start_time : Ref<ReservationStartTimeType| null> = ref(null);
-const start_times = ref(ReservationStartTime);
+const start_times: Ref<ReservationStartTimeType[]> = ref(ReservationStartTime);
 const duration = ref(0);
 let durations: number[] = Object.values(ReservationDurationEnum)
 const event_type: Ref<ReservationTypeEnumType | null> = ref(ReservationTypeEnum[0]);
-const event_types: ReservationTypeEnumType[] = Object.values(ReservationTypeEnum);
 const isDouble = ref(false);
 const participants : Ref<Member[]> = ref([]);
 const loading = ref(false);
+const reasons: string[] = Object.values(EventReasonEnum);
+const reason = ref("");
 
 
 onMounted(() => {
@@ -162,7 +165,8 @@ const onSubmit = async (e: Event) => {
 		duration: duration.value,
 		is_double: isDouble.value,
 		court : courtInput.id,
-		event_type: tokenService.isAdmin.value ? event_type.value.value : "club_reservation",
+		event_type: "event",
+		reason: reason.value,
 		participants: participants.value.map((p) => p.id)
 	};
 
@@ -170,13 +174,13 @@ const onSubmit = async (e: Event) => {
 	console.log("CreateReservation.submit - payload", payload);
 
 	try {
-		const data: Reservation = await apiService.post(ApiRoutes.CreateReservation, payload);
+		const data: Reservation = await apiService.post(ApiRoutes.CreateEvent, payload);
 
 		if(data.id){
 			toast.add({
 				severity: "success",
-				summary: "Reservation created",
-				detail: data.event_type + " " + data.status,
+				summary: "Event created",
+				detail: data.event_type + " is " + data.status,
 				life: 5000
 			});
 
@@ -204,7 +208,7 @@ const onSubmit = async (e: Event) => {
 
 <template>
 	<div class="">
-		<h3 class="font-semibold mb-2 text-center">Ajouter une réservation</h3>
+		<h3 class="font-semibold mb-2 text-center">Ajouter un événement</h3>
 		<form class="flex flex-col gap-y-6 mt-4">
 			<!-- InputGroup : Tennis court -->
 			<InputGroup v-if="tokenService.isAdmin.value">
@@ -214,12 +218,11 @@ const onSubmit = async (e: Event) => {
 				<FloatLabel  variant="in">
 					<Select
 						id="event_type"
-						v-model="event_type"
-						:options="event_types"
-						optionLabel="text"
+						v-model="reason"
+						:options="reasons"
 						checkmark
 					/>
-					<label for="court" class="text-black">Type d'événement</label>
+					<label for="court" class="text-black">Raison de l'événement</label>
 				</FloatLabel>
 			</InputGroup>
 			<!-- InputGroup : Tennis court -->

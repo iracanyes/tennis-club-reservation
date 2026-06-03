@@ -31,37 +31,25 @@ const items = ref([
 				icon: 'pi pi-calendar-plus',
 				badge: 5,
 				route: "/reservations/me",
-			},
-			{
-				label: 'Annuler une réservation',
-				icon: 'pi pi-send',
-				route: "/reservations/cancel",
 			}
 		]
 	},
 	{
 		label: 'Événements',
 		icon: 'pi pi-calendar-clock',
+		// utilisation du table spread pour ajouter les éléments à afficher seulement pour les administrateurs
 		items: [
-			{
-				label: 'Liste des événements',
-				icon: 'pi pi-trophy',
-				badge: 3,
-				route: "/events",
-			},
-			// utilisation du table spread pour ajouter les éléments à afficher seulement pour les administrateurs
 			...(tokenService.isAdmin.value ?
 				[
 					{
-						label: 'Ajouter',
-						icon: 'pi pi-list',
+						label: 'Gestion des événements',
+						icon: 'pi pi-trophy',
 						badge: 6,
-						route: "/events/add",
+						route: "/events",
 					}
 				]
 				: []
 			)
-
 		]
 	},
 	{

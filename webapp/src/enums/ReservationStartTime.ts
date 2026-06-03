@@ -1,4 +1,4 @@
-const ReservationStartTime = [
+const ReservationStartTime: ReservationStartTimeType[] = [
   { number : 9, str : "09:00" },
   { number : 10, str : "10:00" },
   { number : 11, str : "11:00" },
@@ -14,9 +14,9 @@ const ReservationStartTime = [
   { number : 21, str : "21:00" },
 ];
 
-type ReservationStartTime = {
+type ReservationStartTimeType = {
   number: number;
   str : string;
 }
 
-export default ReservationStartTime;
+export {type ReservationStartTimeType, ReservationStartTime};

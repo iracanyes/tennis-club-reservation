@@ -8,23 +8,21 @@ import {isNil} from "lodash";
 import { DataTable, Column, Tag, Button, ButtonGroup } from "primevue";
 
 const router = useRouter();
-const myReservations = ref<Reservation[]>([]);
+const events = ref<Reservation[]>([]);
 const apiService = ApiService.getInstance();
-let tomorrow = new Date();
-
+const tomorrow = new Date();
 
 onMounted(async () => {
 
-	tomorrow = new Date();
 	tomorrow.setDate(tomorrow.getDate() + 1);
 
 	try {
-		const result = await apiService.get(ApiRoutes.MyReservations);
+		const result = await apiService.get(ApiRoutes.ListEvents);
 
 		console.log("MyReservationTableView.MyReservations - result ",result);
 
 		if(result){
-			myReservations.value = result as Reservation[];
+			events.value = result as Reservation[];
 		}
 	}catch (e) {
 		console.error(e);
@@ -33,7 +31,7 @@ onMounted(async () => {
 });
 
 const getSeverity = (reservation: Reservation) => {
-	console.log("MyReservationTableView.getSeverity - ",reservation);
+	// console.log("MyReservationTableView.getSeverity - ",reservation);
 	switch (reservation.status) {
 		case 'active':
 			return 'success';
@@ -72,7 +70,7 @@ const deleteReservation = async (reservation: Reservation) => {
 <template>
 	<section id="ownReservationsTable" class="flex h-full justify-center items-center w-full">
 		<DataTable
-			:value="myReservations"
+			:value="events"
 			paginator
 			:rows="5"
 			:rowsPerPageOptions="[5, 10, 20, 50]"
@@ -85,7 +83,7 @@ const deleteReservation = async (reservation: Reservation) => {
 					{{ slotProps.data.duration + "h"}}
 				</template>
 			</Column>
-			<Column field="is_double" header="En double?" style="width: 25%"></Column>
+			<Column field="reason" header="Raison" style="width: 25%"></Column>
 			<Column field="event_type" header="Type d'événement" style="width: 25%"></Column>
 			<Column header="Statut">
 				<template #body="slotProps">

@@ -15,7 +15,7 @@ import {
 
 <template>
   <div class="h-full flex flex-col justify-center items-center bg-amber-400">
-		<h1 class="text-white text-lg font-semibold p-2">Dashboard : Admin</h1>
+		<h1 class="text-white text-xl font-semibold p-2">Admin Dashboard </h1>
 
 		<div class="h-full w-full flex flex-row bg-amber-400">
 			<div class="h-full w-3/4 ">
