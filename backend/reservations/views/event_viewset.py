@@ -38,7 +38,7 @@ class EventViewSet(viewsets.ModelViewSet):
             request.data._mutable = True
         # Member can only author their reservation
         # Set authenticated member as reservation's author
-        request.data["author"] = str(request.user.id)
+        request.data["author_id"] = str(request.user.id)
         request.data["status"] = Reservation.StatusChoices.ACTIVE
 
         serializer = self.serializer_class(data=request.data)

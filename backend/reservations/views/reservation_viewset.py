@@ -8,8 +8,9 @@ from rest_framework.exceptions import PermissionDenied, APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+from members.models import Member
 from reservations.permissions import IsAuthorOrAdminOrReadOnly
-from reservations.models import Reservation
+from reservations.models import Court, Reservation
 from reservations.serializers import ReservationSerializer, ReservationDeleteSerializer
 
 
@@ -32,7 +33,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
         """
         List all reservations
         """
-        serializer = self.serializer_class(self.queryset, many=True)
+        serializer = self.serializer_class(
+            self.queryset,
+            many=True
+        )
 
         return Response(serializer.data)
 
@@ -51,11 +55,13 @@ class ReservationViewSet(viewsets.ModelViewSet):
             request.data._mutable = True
         # Member can only author their reservation
         # Set authenticated member as reservation's author
-        request.data["author"] = str(request.user.id)
+        request.data["author_id"] = str(request.user.id)
+        request.data["status"] = Reservation.StatusChoices.ACTIVE
 
         # Member are allowed to create only club reservations
         if not request.user.is_staff :
             request.data['event_type'] = Reservation.EventTypeChoices.CLUB_RESERVATION
+            request.data["reason"] = Reservation.LockReasonChoices.CLUB_RESERVATION
 
 
         if settings.DEBUG :
@@ -121,7 +127,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
         Get authenticated user's reservations
         """
         # We exclude all event created by Admin member
-        serializer = self.serializer_class(self.queryset.filter(author=request.user).exclude(event_type=Reservation.EventTypeChoices.EVENT), many=True)
+        serializer = self.serializer_class(
+            self.queryset.prefetch_related('court').prefetch_related('participants')
+                .filter(author=request.user).exclude(event_type=Reservation.EventTypeChoices.EVENT),
+            many=True
+        )
 
         return Response(serializer.data)
 

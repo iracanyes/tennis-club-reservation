@@ -84,7 +84,11 @@ const deleteReservation = async (reservation: Reservation) => {
 				</template>
 			</Column>
 			<Column field="reason" header="Raison" style="width: 25%"></Column>
-			<Column field="event_type" header="Type d'événement" style="width: 25%"></Column>
+			<Column field="court.number" header="Court" style="width: 25%">
+				<template #body="slotProps">
+					{{ slotProps.data.court.number + " [" + slotProps.data.court.type + "]"  }}
+				</template>
+			</Column>
 			<Column header="Statut">
 				<template #body="slotProps">
 					<Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data)" />

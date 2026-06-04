@@ -67,6 +67,7 @@ const deleteReservation = async (reservation: Reservation) => {
 }
 
 
+
 </script>
 
 <template>
@@ -85,7 +86,11 @@ const deleteReservation = async (reservation: Reservation) => {
 					{{ slotProps.data.duration + "h"}}
 				</template>
 			</Column>
-			<Column field="is_double" header="En double?" style="width: 25%"></Column>
+			<Column field="is_double" header="En double?" style="width: 25%">
+				<template #body="slotProps">
+					{{   ( slotProps.data.is_double ? "Oui" : "Non") }}
+				</template>
+			</Column>
 			<Column field="event_type" header="Type d'événement" style="width: 25%"></Column>
 			<Column header="Statut">
 				<template #body="slotProps">

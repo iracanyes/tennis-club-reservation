@@ -18,6 +18,9 @@ const ApiRoutes = {
   DeleteReservation : '/api/reservations/',
   ListEvents : '/api/events/',
   CreateEvent : '/api/events/',
+  ListCourts: '/api/courts/',
+  CreateCourt: '/api/courts/',
+  DeleteCourt: '/api/courts/',
 } as const
 
 export default ApiRoutes

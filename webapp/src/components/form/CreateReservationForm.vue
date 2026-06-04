@@ -41,7 +41,6 @@ const start_times = ref(ReservationStartTime);
 const duration = ref(0);
 let durations: number[] = Object.values(ReservationDurationEnum)
 const event_type: Ref<ReservationTypeEnumType | null> = ref(ReservationTypeEnum[0]);
-const event_types: ReservationTypeEnumType[] = Object.values(ReservationTypeEnum);
 const isDouble = ref(false);
 const participants : Ref<Member[]> = ref([]);
 const loading = ref(false);
@@ -161,9 +160,9 @@ const onSubmit = async (e: Event) => {
 		start_time: start_time.value.str,
 		duration: duration.value,
 		is_double: isDouble.value,
-		court : courtInput.id,
+		court_id : courtInput.id,
 		event_type: tokenService.isAdmin.value ? event_type.value.value : "club_reservation",
-		participants: participants.value.map((p) => p.id)
+		participants_ids: participants.value.map((p) => p.id)
 	};
 
 	console.log("CreateReservation.submit - court.value", court.value);
@@ -206,22 +205,7 @@ const onSubmit = async (e: Event) => {
 	<div class="">
 		<h3 class="font-semibold mb-2 text-center">Ajouter une réservation</h3>
 		<form class="flex flex-col gap-y-6 mt-4">
-			<!-- InputGroup : Tennis court -->
-			<InputGroup v-if="tokenService.isAdmin.value">
-				<InputGroupAddon>
-					<i class="pi pi-objects-column"></i>
-				</InputGroupAddon>
-				<FloatLabel  variant="in">
-					<Select
-						id="event_type"
-						v-model="event_type"
-						:options="event_types"
-						optionLabel="text"
-						checkmark
-					/>
-					<label for="court" class="text-black">Type d'événement</label>
-				</FloatLabel>
-			</InputGroup>
+
 			<!-- InputGroup : Tennis court -->
 			<InputGroup>
 				<InputGroupAddon>

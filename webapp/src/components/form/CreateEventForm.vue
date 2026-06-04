@@ -164,10 +164,10 @@ const onSubmit = async (e: Event) => {
 		start_time: start_time.value.str,
 		duration: duration.value,
 		is_double: isDouble.value,
-		court : courtInput.id,
+		court_id : courtInput.id,
 		event_type: "event",
 		reason: reason.value,
-		participants: participants.value.map((p) => p.id)
+		participants_ids: participants.value.map((p) => p.id)
 	};
 
 	console.log("CreateReservation.submit - court.value", court.value);

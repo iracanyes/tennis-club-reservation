@@ -2,6 +2,7 @@ import logging
 from datetime import timedelta, datetime, date, time
 from dateutil.relativedelta import relativedelta, SU, SA
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
@@ -15,9 +16,22 @@ from reservations.validators import ReservationValidator
 class ReservationSerializer(serializers.ModelSerializer):
     __logger = logging.getLogger(__name__)
 
-    author = serializers.PrimaryKeyRelatedField(queryset=Member.objects.all())
-    court = serializers.PrimaryKeyRelatedField(queryset=Court.objects.all())
-    participants = serializers.PrimaryKeyRelatedField(queryset=Member.objects.all(), many=True)
+    # Used to write (create or update) a reservation and attach the author's reference without attempt to create a new member
+    author_id = serializers.PrimaryKeyRelatedField(queryset=Member.objects.all(), write_only=True, source="author")
+    # Only accessible on read
+    author = MemberReservationSerializer(read_only=True)
+
+    court_id = serializers.PrimaryKeyRelatedField(queryset=Court.objects.all(), write_only=True, source="court")
+    court = CourtSerializer(read_only=True)
+
+    participants_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Member.objects.all(),
+        write_only=True,
+        source="participants",
+        many=True,
+
+    )
+    participants = MemberReservationSerializer(read_only=True, many=True)
 
     class Meta:
         model = Reservation
@@ -32,8 +46,11 @@ class ReservationSerializer(serializers.ModelSerializer):
             "duration",
             "is_double",
             "status",
+            "court_id",
             "court",
+            "author_id",
             "author",
+            "participants_ids",
             "participants"
         ]
 
@@ -42,11 +59,14 @@ class ReservationSerializer(serializers.ModelSerializer):
         if settings.DEBUG :
             self.__logger.warning(f"ReservationSerializer.validate - data: {data}")
 
-        if not data['author'] :
+        if not 'author_id' in data and not "author" in data :
             raise serializers.ValidationError({'message': 'Author not found.'})
 
-        if not data['court'] :
-            raise serializers.ValidationError({'message': 'Court not found.'})
+        if not 'court_id' in data and not "court" in data :
+            raise serializers.ValidationError({'message': 'Court or court ID not provided.'})
+
+        if not 'participants_ids' in data and not "participants" in data :
+            raise serializers.ValidationError({'message': 'participants not found.'})
 
         status_choices = [status_choice.value for status_choice in Reservation.StatusChoices]
 
