@@ -89,6 +89,15 @@ const routes = [
           requiresAuth: true,
           requiresAdmin: true
         }
+      },
+      {
+        path: "/courts",
+        component: () => import("@pages/CourtsView.vue"),
+        name: "courts",
+        meta: {
+          requiresAuth: true,
+          requiresAdmin: true
+        }
       }
     ]
   },
