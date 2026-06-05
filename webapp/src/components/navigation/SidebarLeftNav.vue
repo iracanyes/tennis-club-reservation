@@ -24,7 +24,7 @@ const items = ref([
 			{
 				label: 'Liste des réservations',
 				icon: 'pi pi-calendar-times',
-				route: "/reservations/list",
+				route: "/reservations",
 			},
 			{
 				label: 'Mes réservations',
@@ -56,18 +56,19 @@ const items = ref([
 		label: 'Terrains',
 		icon: 'pi pi-objects-column',
 		items: [
+			{
+				label : 'Réservation par terrain',
+				icon : 'pi pi-map',
+				route : '/courts/reservations'
+			},
 			...(tokenService.isAdmin.value
 					? [
 						{
-							label : 'Ajouter un terrain',
+							label : 'Gestion des terrains',
 							icon : 'pi pi-flag',
-							route : '/courts/add'
+							route : '/courts'
 						},
-						{
-							label : 'Supprimer un terrain',
-							icon : 'pi pi-map',
-							route : '/courts/delete'
-						}
+
 					]
 					: []
 			)

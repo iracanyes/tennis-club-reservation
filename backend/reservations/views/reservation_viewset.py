@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime, timedelta
 from django.conf import settings
+from django.db.migrations import serializer
+from django.db.models.aggregates import Count
 from django.http import QueryDict
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
@@ -11,12 +13,12 @@ from rest_framework.response import Response
 from members.models import Member
 from reservations.permissions import IsAuthorOrAdminOrReadOnly
 from reservations.models import Court, Reservation
-from reservations.serializers import ReservationSerializer, ReservationDeleteSerializer
+from reservations.serializers import ReservationSerializer, ReservationDeleteSerializer, CourtReservationSerializer
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
     __logger = logging.getLogger(__name__)
-    queryset = Reservation.objects.all().order_by('-date_reservation', 'start_time')
+    queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -128,12 +130,22 @@ class ReservationViewSet(viewsets.ModelViewSet):
         """
         # We exclude all event created by Admin member
         serializer = self.serializer_class(
-            self.queryset.prefetch_related('court').prefetch_related('participants')
-                .filter(author=request.user).exclude(event_type=Reservation.EventTypeChoices.EVENT),
+            self.queryset.filter(author=request.user).exclude(event_type=Reservation.EventTypeChoices.EVENT),
             many=True
         )
 
         return Response(serializer.data)
 
+    @action(methods=['GET'], detail=False)
+    def by_court(self, request):
+        """
+        Get reservations grouped by court
+        """
+
+        serializer = CourtReservationSerializer(
+            Court.objects.all().prefetch_related("reservations"),
+            many=True
+        )
 
 
+        return Response(serializer.data)

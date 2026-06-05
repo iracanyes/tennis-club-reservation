@@ -13,9 +13,8 @@ import {
 import ApiRoutes from "@navigation/api.routes.ts";
 import ApiService from "@services/api.service.ts";
 import type { Court } from "@dto/index.ts";
-import {isEmpty, isNil} from "lodash";
+import {isEmpty} from "lodash";
 import {TokenService} from "@services";
-import {formatISO} from "date-fns";
 import CourtTypeEnum from "@enums/CourtTypeEnum.ts";
 
 const router = useRouter();
@@ -67,10 +66,7 @@ const onSubmit = async (e: Event) => {
 
 	loading.value = true;
 
-	const courtNumberInput = courtNumber.value;
-	const courtTypeInput = courtType.value;
-
-	if (isEmpty(courtTypeInput)){
+	if (isEmpty(courtType.value)){
 		toast.add({
 			severity: "error",
 			summary: "Please select the court's type.",

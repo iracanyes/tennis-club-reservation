@@ -87,7 +87,7 @@ import CreateCourtForm from "@components/form/CreateCourtForm.vue";
 
 
 			</div>
-			<div class="w-1/4 h-full bg-blue-500 gap-y-4">
+			<div class="w-1/4 h-full gap-y-4">
 				<div class="flex flex-col p-2 gap-y-4">
 					<!-- Card -->
 					<div  class="flex flex-row p-0 justify-between rounded-md border shadow-lg border-emerald-600 bg-emerald-400 ">

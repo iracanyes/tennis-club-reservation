@@ -98,6 +98,14 @@ const routes = [
           requiresAuth: true,
           requiresAdmin: true
         }
+      },
+      {
+        path: "/courts/reservations",
+        component: () => import("@pages/CourtReservationsView.vue"),
+        name: "courts_reservations",
+        meta: {
+          requiresAuth: true,
+        }
       }
     ]
   },

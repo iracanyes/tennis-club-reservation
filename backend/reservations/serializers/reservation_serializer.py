@@ -201,4 +201,9 @@ class ReservationDeleteSerializer(ReservationSerializer):
         return data
 
 
-
+class ReservationWithoutCourtSerializer(ReservationSerializer):
+    class Meta:
+        model = Reservation
+        fields = "__all__"
+        
+    court = None

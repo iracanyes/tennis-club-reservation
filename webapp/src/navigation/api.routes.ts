@@ -13,6 +13,7 @@ const ApiRoutes = {
   StripeCheckoutSession : '/api/payment/checkout_session',
   PlanList: '/api/plans',
   CourtList: '/api/courts',
+  ListReservations: '/api/reservations/',
   CreateReservation : '/api/reservations/',
   MyReservations: '/api/reservations/me/',
   DeleteReservation : '/api/reservations/',

@@ -1,12 +1,13 @@
 import logging
 
 from rest_framework import serializers, exceptions
-
 from reservations.models import Court
 
 
 class CourtSerializer(serializers.ModelSerializer):
     __logger = logging.getLogger(__name__)
+
+
 
     class Meta:
         model = Court
@@ -35,4 +36,5 @@ class CourtSerializer(serializers.ModelSerializer):
             raise exceptions.ValidationError("Court does not exist")
 
         return instance
+
 
