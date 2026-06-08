@@ -1,16 +1,45 @@
+import uuid
+from datetime import datetime
+from uuid import UUID
+
+from django.conf import settings
 from django.contrib.auth import authenticate
+from pip._internal.utils import logging
 from rest_framework import serializers
-from members.models import Member, Address, Category
-from members.serializers import AddressSerializer
+from members.models import Member, Address, Category, MemberRank
+from .address_serializer import AddressSerializer
+from .category_serializer import CategorySerializer
+from .member_rank_serializer import MemberRankSerializer
 
 
 class MemberSerializer(serializers.ModelSerializer):
+    __logger = logging.getLogger(__name__)
     address = AddressSerializer()
-    categories = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), many=True)
+    categories_ids = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), many=True, source='categories', write_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
+    member_ranks = MemberRankSerializer(many=True, source="member_ranks_entries")
 
     class Meta:
         model = Member
-        fields = ['id','aft_id', 'email', 'password', 'firstname', 'lastname', 'gender', 'birthdate', 'phone_number', 'annual_fee_paid', 'is_superuser', 'is_staff', 'is_active', 'address', 'categories']
+        fields = [
+            'id',
+            'aft_id',
+            'email',
+            'password',
+            'firstname',
+            'lastname',
+            'gender',
+            'birthdate',
+            'phone_number',
+            'annual_fee_paid',
+            'is_superuser',
+            'is_staff',
+            'is_active',
+            'address',
+            'categories_ids',
+            'categories',
+            'member_ranks'
+        ]
         extra_kwargs = { 'password' : {'write_only' : True } }
 
 
@@ -65,7 +94,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
         return member
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Member, validated_data):
         print(f"MemberSerializer.update - validated data : {validated_data}")
         print(f"MemberSerializer.update - instance : {instance}")
 
@@ -73,15 +102,23 @@ class MemberSerializer(serializers.ModelSerializer):
         if instance.aft_id != validated_data.get('aft_id'):
             raise serializers.ValidationError("Unable to update the instance! Ids doesn't match.")
 
+        # Extract member_ranks from
+        member_ranks_data = validated_data.pop('member_ranks_entries', [])
+
+        if settings.DEBUG:
+            self.__logger.warning(f"\nMemberSerializer.update - Member_ranks_data : {member_ranks_data}\n")
+
 
         address_serializer = AddressSerializer(instance=instance.address, data=validated_data['address'])
         address_serializer.is_valid(raise_exception=True)
 
-        print(f"MemberSerializer.update - address_serializer.validated_data : {address_serializer.validated_data}")
+        if settings.DEBUG:
+            self.__logger.warning(f"MemberSerializer.update - address_serializer.validated_data : {address_serializer.validated_data}")
 
-        address_serializer.save()   
+        address_serializer.save()
 
-        print(f"MemberSerializer.update - address_serializer.data : {address_serializer.data}")
+        if settings.DEBUG:
+            self.__logger.warning(f"MemberSerializer.update - address_serializer.data : {address_serializer.data}")
 
         instance.email = validated_data.get('email', instance.email)
         instance.firstname = validated_data.get('firstname', instance.firstname)
@@ -94,12 +131,25 @@ class MemberSerializer(serializers.ModelSerializer):
 
         instance.save()
 
-        #
+        # Add newest categories
         for category in validated_data['categories']:
             if not instance.categories.filter(pk=category.id).exists():
                 instance.categories.add(category)
 
         instance.save()
+
+        for member_rank_data in member_ranks_data:
+            rank = member_rank_data.get("rank")
+            points = member_rank_data.get("points")
+
+            MemberRank.objects.update_or_create(
+                member=instance,
+                rank=rank,
+                defaults={"points": points}
+            )
+
+
+
 
         return instance
 
@@ -107,7 +157,24 @@ class MemberSerializer(serializers.ModelSerializer):
 class MemberWithoutPasswordSerializer(MemberSerializer):
     class Meta:
         model = Member
-        fields = ['id','aft_id', 'email', 'firstname', 'lastname', 'gender', 'birthdate', 'phone_number', 'annual_fee_paid', 'is_superuser', 'is_staff', 'is_active', 'address', 'categories']
+        fields = [
+            'id',
+            'aft_id',
+            'email',
+            'firstname',
+            'lastname',
+            'gender',
+            'birthdate',
+            'phone_number',
+            'annual_fee_paid',
+            'is_superuser',
+            'is_staff',
+            'is_active',
+            'address',
+            'categories_ids',
+            'categories',
+            'member_ranks'
+        ]
 
 
 
@@ -154,4 +221,4 @@ class MemberLoginSerializer(serializers.Serializer):
 class MemberReservationSerializer(MemberSerializer):
     class Meta:
         model = Member
-        fields = ["aft_id", "email", "firstname", "lastname", "gender", "birthdate", "ranks", "categories"]
+        fields = ["aft_id", "email", "firstname", "lastname", "gender", "birthdate", "member_ranks", "categories"]

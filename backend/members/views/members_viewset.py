@@ -1,4 +1,6 @@
 from django.db.models import Model
+from django.http import QueryDict
+from pip._internal.utils import logging
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import permission_classes
 from rest_framework.exceptions import PermissionDenied
@@ -11,6 +13,7 @@ from tcr_auth.permissions import IsOwnerOrReadonly
 
 
 class MemberViewSet(viewsets.ModelViewSet):
+  __logger = logging.getLogger(__name__)
   queryset = Member.objects.all().order_by('-date_joined')
   serializer_class = MemberSerializer
   permission_classes = [permissions.IsAuthenticated]
@@ -77,6 +80,10 @@ class MemberViewSet(viewsets.ModelViewSet):
   def update(self, request, pk=None):
     print(f"\nMemberViewSet.update - request : {request.data} \n")
 
+    # Enable mutability on immutable QueryDict
+    if isinstance(request.data, QueryDict):
+      request.data._mutable = True
+
     # If it's an admin request, can update any member,
     # else, only update the authenticated user
     if request.user.is_staff :
@@ -94,7 +101,7 @@ class MemberViewSet(viewsets.ModelViewSet):
 
     print(f"\nMemberViewSet.update - serializer.class : {serializer_class} \n")
 
-    print(f"\nMemberViewSet.update - serializer.data : {serializer.validated_data} \n")
+    print(f"\nMemberViewSet.update - serializer.validated_data : {serializer.validated_data} \n")
 
 
     # See docs serializer - saving instances :

@@ -55,7 +55,7 @@ class Member(AbstractUser):
   # to access address's residents : address.residents
   address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='residents')
   categories = models.ManyToManyField(Category, related_name='members')
-  ranks = models.ManyToManyField(Rank, through="MemberRank")
+  member_ranks = models.ManyToManyField(Rank, through='MemberRank', through_fields=("member", "rank"))
 
 
 
@@ -74,5 +74,6 @@ class Member(AbstractUser):
       'annualFeePaid': {self.annual_fee_paid},
       'address': {self.address},
       'categories': {self.categories},
+      'member_ranks' : {self.member_ranks},
     }}
     """

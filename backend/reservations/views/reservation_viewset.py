@@ -89,9 +89,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
          if (settings.DEBUG):
              self.__logger.warning(f"Updating reservation validated_data: {serializer.validated_data} ")
 
-         serializer.save()
+         updatedMember = serializer.save()
 
-         return Response(serializer.data)
+         return Response(updatedMember)
 
     def destroy(self, request, pk=None):
         """

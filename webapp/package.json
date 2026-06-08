@@ -11,6 +11,7 @@
   "dependencies": {
     "@phosphor-icons/vue": "^2.2.1",
     "@primeuix/themes": "^2.0.3",
+    "@primevue/forms": "^4.5.5",
     "@stripe/stripe-js": "^9.5.0",
     "@tabler/icons-vue": "^3.44.0",
     "@tailwindcss/vite": "^4.2.4",

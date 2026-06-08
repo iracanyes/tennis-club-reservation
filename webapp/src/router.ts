@@ -42,14 +42,6 @@ const routes = [
         }
       },
       {
-        path: AppRoutes.ProfileChangePassword,
-        component: () => import("@components/security/ChangePasswordView.vue"),
-        name: "change_password",
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
         path: AppRoutes.Subscribe,
         component: () => import("@pages/SubscribeView.vue"),
         name: "subscribe",
@@ -58,7 +50,7 @@ const routes = [
         }
       },
       {
-        path: "/subscribe/payment/success",
+        path: AppRoutes.SubscribePaymentSuccess,
         component: () => import("@pages/StripeCheckoutSessionSuccessView.vue"),
         name: "stripe_checkout_success",
         meta: {
@@ -66,11 +58,27 @@ const routes = [
         }
       },
       {
-        path: "/subscribe/payment/cancel",
+        path: AppRoutes.SubscribePaymentCancel,
         component: () => import("@pages/StripeCheckoutSessionCancelView.vue"),
         name: "stripe_checkout_cancel",
         meta: {
           requiresAuth: false
+        }
+      },
+      {
+        path: AppRoutes.ProfileChangePassword,
+        component: () => import("@components/security/ChangePasswordView.vue"),
+        name: "change_password",
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: AppRoutes.ProfileUpdate,
+        component: () => import("@components/security/ProfileUpdateView.vue"),
+        name: "profile_update",
+        meta: {
+          requiresAuth: true
         }
       },
       {

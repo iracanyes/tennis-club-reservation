@@ -1,8 +1,8 @@
 import CSRFService from "./csrf.service.ts";
 import {isNil} from "lodash";
 import CookieService from "./cookie.service.ts";
-import {useRouter} from "vue-router";
-import { useToast } from "primevue";
+import { useRouter } from "vue-router";
+import { useToast } from "primevue/usetoast";
 import TokenService from "@services/token.service.ts";
 
 
@@ -124,12 +124,15 @@ class APIService {
     urlPath = urlPath.endsWith("/") ? urlPath : `${urlPath}/`;
 
     try{
-      const response = await fetch(urlPath, {
+      const response = await fetch(this.baseUrl + urlPath, {
         method: 'PUT',
         mode: 'cors',
         cache: 'default',
         credentials: 'same-origin',
-        body: payload,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify(payload),
       })
 
       if(!response.ok){

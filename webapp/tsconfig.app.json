@@ -30,7 +30,8 @@
       "@types/*": ["./types/*"],
       "@dto/*": ["./dto/*"],
       "@enums": ["./enums/index.ts"],
-      "@enums/*": ["./enums/*"]
+      "@enums/*": ["./enums/*"],
+      "@dto": ["./dto/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
