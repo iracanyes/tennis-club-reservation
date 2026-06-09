@@ -55,8 +55,8 @@ const initialValues = reactive({
 	gender: {},
 	birthdate: "",
 	phone_number: "",
-	category: [],
-	rank: [],
+	category: null,
+	rank: null,
 	rank_points : null,
 	address_id: "",
 	street: "",
@@ -112,20 +112,36 @@ const onSubmit = async ({ states, values, valid }: FormSubmitEvent) => {
 	}
 
 
-	let ranksInput = profile.value.member_ranks;
+	let ranksInput = [];
 	let categoriesInput = profile.value.categories;
 
 	if(states.category.touched && values.category !== ""){
 		categoriesInput.push(values.category);
 	}
 
-	if(states.rank.touched && values.rank_points.touched !== ""){
-		ranksInput.push({
-			date_created : Date.now(),
-			rank : values.rank.id,
-			member : profile.value.id,
-			points : values.rank_points,
-		});
+	if(states.rank.touched || states.rank_points.touched){
+		if(isNil(initialValues.rank)){
+			if(isNil(values.rank)){
+				toast.add({
+					severity: "warning",
+					summary: "Classement requis.",
+					detail : "Sélectionner un classement.",
+					life: 3000
+				});
+				return;
+			}else{
+				ranksInput.push({
+					rank_id : values.rank.id,
+					points : values.rank_points,
+				});
+			}
+		}else{
+			ranksInput.push({
+				rank_id : initialValues.rank.id,
+				points : values.rank_points,
+			});
+		}
+
 	}
 
 	let payload = {
@@ -150,11 +166,7 @@ const onSubmit = async ({ states, values, valid }: FormSubmitEvent) => {
 			zip_code : isEmpty(values.zip_code) ? profile.value.address.zip_code : values.zip_code,
 			country : isEmpty(values.country) ? profile.value.address.country : values.country,
 		},
-		member_ranks : states.rank.touched
-			? [{
-				rank_id: values.rank.id,
-				points: values.rank_points
-			}] : [],
+		member_ranks : ranksInput,
 		categories_ids : states.category.touched ? [values.category.id] : []
 	}
 

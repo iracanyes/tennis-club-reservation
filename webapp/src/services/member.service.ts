@@ -9,7 +9,7 @@ class MemberService {
   private static instance: MemberService;
   private readonly toast = useToast();
 
-  public static getInstance(){
+  public static getInstance(): MemberService{
     if (isNil(MemberService.instance)){
       MemberService.instance = new MemberService();
     }
@@ -62,6 +62,29 @@ class MemberService {
     return [];
   }
 
+  public async getMembers(): Promise<Member[]>{
+    try{
+      const result = await this.apiService.get(ApiRoutes.MemberList);
+
+      if(result){
+        console.log("MemberService.getMembers");
+        console.log(result);
+        return result;
+      }
+    }catch (e) {
+      console.error(e);
+      this.toast.add({
+        severity: "danger",
+        summary: "Membres : Erreur",
+        detail: "Erreur lors de la récupération des membres",
+        life: 3000
+      });
+    }
+
+    return [];
+
+  }
+
   public async updateProfile(payload : Member){
     try{
       const result = await this.apiService.put(ApiRoutes.UpdateProfile + payload.id, payload);
@@ -78,6 +101,21 @@ class MemberService {
         detail: "Erreur lors de la mise à jour du profile",
         life: 3000
       });
+    }
+
+    return false;
+  }
+
+  public async deleteMember(memberId: string){
+    try {
+      const result = await this.apiService.delete(ApiRoutes.MemberDelete + memberId);
+
+      console.log("MembersService.deleteMember result : ",result);
+      if(result){
+        return true;
+      }
+    }catch (e: any) {
+      console.error("MembersService.deleteMember() errors : ",e);
     }
 
     return false;

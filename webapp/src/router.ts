@@ -82,6 +82,14 @@ const routes = [
         }
       },
       {
+        path: AppRoutes.MemberList,
+        component: () => import("@pages/MembersView.vue"),
+        name : "member_list",
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: "/reservations/me",
         component: () => import("@pages/MyReservationsView.vue"),
         name: "my_reservations",
@@ -142,12 +150,12 @@ router.beforeEach((to, from) => {
   }
 
   // all routes are private except authentication routes
-  if(to.meta?.requiresAuth) {
+  if(to.meta?.requiresAuth && !isNil(token)) {
     console.log(`router.beforeEach - to.meta.requiresAuth : ${(to.meta.requiresAuth as boolean)}`);
     // Redirect to login allowed
     if(to.path.includes("login")) return true;
 
-    if(!isNil(token) && token.token.length > 0){
+    if(token.token.length > 0){
       console.log(`router.beforeEach - !isNil(tokenString) && JSON.parse(tokenString).token.length > 0 : ${!isNil(tokenString) && JSON.parse(tokenString).token.length > 0}`);
       // If admin's route and user not admin, redirect to admin login page
       if(to.meta?.requiresAdmin && token.type !== "admin") return { name : "admin-login"};
@@ -156,6 +164,9 @@ router.beforeEach((to, from) => {
 
     }else{
       console.log(`router.beforeEach - !(!isNil(tokenString) && JSON.parse(tokenString).token.length > 0) : REDIRECT TO LOGIN`);
+
+      if(to.name?.contains("login")) return true;
+
       if(to.meta?.requiresAdmin){
         return {name: 'admin-login'};
       }else {

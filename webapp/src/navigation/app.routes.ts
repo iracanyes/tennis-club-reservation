@@ -9,6 +9,8 @@ const AppRoutes =  {
   SubscribePaymentSuccess : "/subscribe/payment/success",
   SubscribePaymentCancel : "/subscribe/payment/cancel",
   MyReservations : "/reservations/me",
+  MemberList: "/members/",
+
 }
 
 type AppRoutes =  (typeof AppRoutes)[keyof typeof AppRoutes]
