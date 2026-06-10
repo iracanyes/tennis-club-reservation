@@ -1,7 +1,7 @@
 import CSRFService from "./csrf.service.ts";
 import {isNil} from "lodash";
 import CookieService from "./cookie.service.ts";
-import { useRouter } from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import { useToast } from "primevue/usetoast";
 import TokenService from "@services/token.service.ts";
 
@@ -14,6 +14,7 @@ class APIService {
   private readonly tokenService : TokenService = TokenService.getInstance();
   private readonly toast  = useToast();
   private readonly router = useRouter();
+  private readonly route = useRoute();
 
   private constructor() {}
 
@@ -59,7 +60,13 @@ class APIService {
         if(localStorage.getItem('access_token')){
           this.tokenService.setToken(null);
         }
-        await this.router.push({ name : 'login' });
+
+        if(this.route.meta.requiresAdmin){
+          await this.router.push({ name : 'admin-login' });
+        }else{
+          await this.router.push({ name : 'login' });
+        }
+
       }
 
       if(!response.ok){
@@ -104,7 +111,12 @@ class APIService {
         if(localStorage.getItem('access_token')){
           this.tokenService.setToken(null);
         }
-        await this.router.push({ name : 'login' });
+
+        if(this.route.meta.requiresAdmin){
+          await this.router.push({ name : 'admin-login' });
+        }else{
+          await this.router.push({ name : 'login' });
+        }
       }
 
       if(!response.ok){
@@ -134,6 +146,18 @@ class APIService {
         },
         body: JSON.stringify(payload),
       })
+
+      if(response.status === 401){
+        if(localStorage.getItem('access_token')){
+          this.tokenService.setToken(null);
+        }
+
+        if(this.route.meta.requiresAdmin){
+          await this.router.push({ name : 'admin-login' });
+        }else{
+          await this.router.push({ name : 'login' });
+        }
+      }
 
       if(!response.ok){
         throw new Error(`${response.status} : ${response.statusText}`);
@@ -175,7 +199,12 @@ class APIService {
         if(localStorage.getItem('access_token')){
           this.tokenService.setToken(null);
         }
-        await this.router.push({ name : 'login' });
+
+        if(this.route.meta.requiresAdmin){
+          await this.router.push({ name : 'admin-login' });
+        }else{
+          await this.router.push({ name : 'login' });
+        }
       }
 
       if(!response.ok){

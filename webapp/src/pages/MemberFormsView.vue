@@ -4,6 +4,8 @@ import {useRoute, useRouter} from "vue-router";
 import {TokenService} from "@services";
 import {onMounted} from "vue";
 import MemberUpdateForm from "@components/form/MemberUpdateForm.vue";
+import AppRoutes from "@navigation/app.routes.ts";
+import MemberCreateForm from "@components/form/MemberCreateForm.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -32,7 +34,8 @@ onMounted(() => {
 
 				<!-- member's reservations list  -->
 				<div class="card flex">
-					<MemberUpdateForm :id="route.params.id" />
+					<MemberUpdateForm v-if="route.path === AppRoutes.MemberUpdate" :id="route.params.id" />
+					<MemberCreateForm v-if="route.path === AppRoutes.MemberCreate" />
 				</div>
 
 

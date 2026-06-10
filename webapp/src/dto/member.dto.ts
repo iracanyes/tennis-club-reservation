@@ -15,6 +15,6 @@ export default interface Member {
   annual_fee_paid: boolean;
   date_joined: Date;
   last_login: Date
-  categories: Category[];
+  categories?: Category[];
   member_ranks: MemberRank[]
 }

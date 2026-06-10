@@ -4,6 +4,7 @@ import {ref} from "vue";
 import { useRouter, RouterLink } from "vue-router";
 import {isNil} from "lodash";
 import TokenService from "@services/token.service.ts";
+import AppRoutes from "@navigation/app.routes.ts";
 
 const router  = useRouter();
 const tokenService = TokenService.getInstance();
@@ -81,14 +82,14 @@ const items = ref([
 			{
 				label: 'Liste des membres',
 				icon: 'pi pi-users',
-				route: "/members",
+				route: AppRoutes.MemberList,
 			},
 			...(tokenService.isAdmin.value
 				? [
 						{
 							label: 'Ajouter un membre',
 							icon: 'pi pi-user-plus',
-							route: "/members/add",
+							route: AppRoutes.MemberCreate,
 						}
 					]
 				: []

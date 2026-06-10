@@ -281,7 +281,7 @@ onMounted(async () => {
 									<PhCake :size="32" weight="duotone" />
 								</InputGroupAddon>
 								<FloatLabel>
-									<DatePicker id="birthdate" name="birthdate" />
+									<DatePicker id="birthdate" name="birthdate"  dateFormat="dd/mm/yy" />
 									<label for="birthdate">Date de naissance</label>
 								</FloatLabel>
 							</InputGroup>

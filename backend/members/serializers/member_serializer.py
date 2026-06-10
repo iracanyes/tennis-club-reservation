@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime
 from uuid import UUID
-
 from django.conf import settings
 from django.contrib.auth import authenticate
 from pip._internal.utils import logging
@@ -179,13 +178,15 @@ class MemberWithoutPasswordSerializer(MemberSerializer):
 
 
 
-class MemberDeleteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Member
-        fields=["id", "aft_id", "email"]
+class MemberDeleteSerializer(serializers.Serializer):
+    __logger = logging.getLogger(__name__)
+    id = serializers.UUIDField()
+    email = serializers.EmailField()
+    aft_id = serializers.IntegerField()
 
     def validate(self, data):
-        #print(f"MemberDeleteSerializer.validate - data : {data}")
+        if settings.DEBUG :
+            self.__logger.warning(f"MemberDeleteSerializer.validate - data : {data}")
 
         member = Member.objects.filter(id=data['id'], aft_id=data['aft_id'], email=data['email'])
 

@@ -5,6 +5,7 @@ const AppRoutes =  {
   DashboardAdmin : "/admin",
   ProfileChangePassword : "/profile/change_password",
   ProfileUpdate: "/profile/update",
+  MemberCreate: "/member/create",
   MemberUpdate : "/members/update/:id",
   Subscribe : "/subscribe",
   SubscribePaymentSuccess : "/subscribe/payment/success",

@@ -20,6 +20,7 @@ import {
 import type {Category, Member, Rank} from "@dto";
 import {MemberService, TokenService} from "@services";
 import AppRoutes from "@navigation/app.routes.ts";
+import {formatISO} from "date-fns";
 
 const router = useRouter();
 const tokenService = TokenService.getInstance();
@@ -72,13 +73,13 @@ const getSeverity = (member: Member) => {
 };
 
 /**
- *
+ * Delete member method
  * @param member
  */
 const deleteMember = async (member: Member) => {
 	console.log("MembersView.deleteMember - ",member);
 	try {
-		const result = await memberService.deleteMember(member.id);
+		const result = await memberService.deleteMember(member);
 
 		console.log("MembersView.deleteMember result : ",result);
 		if(result){
@@ -89,21 +90,15 @@ const deleteMember = async (member: Member) => {
 	}
 }
 
+/**
+ * Computed list of members after filter and sort
+ */
 const filteredMembers  = computed (() => {
 	if(members.value.length === 0){
 		return [];
 	}
 
 	let memberList = [...members.value];
-
-	console.log("MembersView.applyFilters - ");
-	console.log("Category");
-	console.log(category.value, enableCategoryFilter.value);
-	console.log(category.value?.name);
-	console.log("Rank");
-	console.log(rank.value, enableRankFilter.value);
-	console.log(memberList);
-
 
 	if(enableCategoryFilter.value && !isNil(category.value)){
 		memberList = memberList.filter( item => item.categories[0].name === category.value.name);
@@ -112,9 +107,6 @@ const filteredMembers  = computed (() => {
 	if(enableRankFilter.value && !isNil(rank.value)){
 		memberList = memberList.filter( item => item.member_ranks[0].rank.name === rank.value.name);
 	}
-
-	console.log("MembersView.applyFilters - Applied");
-	console.log(memberList);
 
 	if(enableRankSorting.value){
 		memberList = memberList.sort((a, b) => {
@@ -248,7 +240,7 @@ const resetFilters = () => {
 				</div>
 			</div>
 		</section>
-		<ScrollPanel style="min-width: 790px;width: 980px;height: 500px">
+		<ScrollPanel style="min-width: 790px;width: 1080px;height: 500px">
 			<DataTable
 				:value="filteredMembers"
 				size="small"
@@ -280,7 +272,11 @@ const resetFilters = () => {
 					</template>
 				</Column>
 				<Column field="gender" header="Sexe" style="width: 25%"></Column>
-				<Column field="birthdate" header="Date de naissance" style="width: 25%"></Column>
+				<Column header="Date de naissance" style="width: 25%">
+					<template #body="slotProps">
+						{{ formatISO(slotProps.data.birthdate, { representation: "date" }) }}
+					</template>
+				</Column>
 				<Column field="email" header="Email" style="width: 25%"></Column>
 				<Column field="phone_number" header="N° de téléphone" style="width: 25%"></Column>
 				<Column
@@ -351,7 +347,7 @@ const resetFilters = () => {
 								icon="pi pi-trash"
 								severity="warn"
 								size="small"
-								@click.prevent="deleteMember(slotProps.data.id)"
+								@click="deleteMember(slotProps.data)"
 							/>
 						</div>
 					</template>

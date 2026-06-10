@@ -12,12 +12,12 @@ import {
 	InputGroupAddon,
 	InputNumber,
 	InputText,
+	Password,
 	ScrollPanel,
 	Select,
 	useToast,
 } from "primevue";
-import { APIService, MemberService } from "@services";
-import ApiRoutes from "@navigation/api.routes.ts";
+import { MemberService } from "@services";
 import {
 	PhCake,
 	PhCity,
@@ -38,36 +38,13 @@ import type { Category, Rank } from "@dto";
 import { isEmpty, isNil } from "lodash";
 import {formatISO} from "date-fns";
 
-const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-const apiService = APIService.getInstance();
 const memberService = MemberService.getInstance();
-const profile = ref();
 const genders = ref(GenderTypeEnum);
 const ranks: Ref<Rank[]> = ref([]);
 const categories: Ref<Category[]> = ref([]);
 
-const initialValues = reactive({
-	id: "",
-	aft_id: "",
-	email: "",
-	firstname: "",
-	lastname: "",
-	gender: {},
-	birthdate: "",
-	phone_number: "",
-	category: null,
-	rank: null,
-	rank_points : null,
-	address_id: "",
-	street: "",
-	number: "",
-	city: "",
-	state: "",
-	zip_code: "",
-	country: "",
-});
 
 const resolver = ({ values } : any) => {
 	const errors = {
@@ -80,7 +57,6 @@ const resolver = ({ values } : any) => {
 		phone_number: [],
 		category: [],
 		rank: [],
-		address_id: [],
 		street: [],
 		number: [],
 		city: [],
@@ -96,49 +72,87 @@ const resolver = ({ values } : any) => {
 	}
 
 	const myAftId = parseInt( values.aft_id );
-
 	console.log("myAftId : ", myAftId, "\nvalues.aft_id : ", values.aft_id );
 
 	if( myAftId < 1000000 || myAftId > 9999999 ){
 		errors.aft_id.push({ message : "AFT ID doit être compris entre 1000000 et 9999999."});
 	}
 
+	const validEmail = String(values.email)
+		.toLowerCase()
+		.match(
+			/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+		);
+
+	if(isNil(values.email) || !validEmail){
+		errors.email.push({
+			message : "Email is invalid."
+		});
+	}
+
+
+
+	if(isNil(values.aft_id)){
+		errors.aft_id.push({ message : "AFT ID est requis."});
+	}
+
 	return { values, errors };
 
 }
 
+/**
+ * Submit method
+ * @param param0
+ * @param param0.states
+ * @param param0.values
+ * @param param0.valid
+ */
 const onSubmit = async ({ states, values, valid }: FormSubmitEvent) => {
 	if( valid ){
 		toast.add({  severity: "success", summary: "Mise à jour en cours...", life: 3000});
 	}
 
-	// Member's rank and category input
+	if(values.new_password.length === 0 || values.confirm_password.length === 0){
+		toast.add({
+			severity: "error",
+			summary : "Mot de passe incorrect!",
+			detail : "Entrez votre mot de passe et validez le.",
+			life : 3000
+
+		});
+		return;
+	}
+
+	if(values.new_password.length === 0 || values.new_password !== values.confirm_password){
+		toast.add({
+			severity: "error",
+			summary : "Mot de passe incorrect!",
+			detail : "Les deux mots de passe doivent correspondre.",
+			life : 3000
+
+		});
+		return;
+	}
+
 	let ranksInput = [];
-	let categoriesInput = profile.value.categories;
+	let categoriesInput = [];
 
 	if(states.category.touched && values.category !== ""){
 		categoriesInput.push(values.category);
 	}
 
 	if(states.rank.touched || states.rank_points.touched){
-		if(isNil(initialValues.rank)){
-			if(isNil(values.rank)){
-				toast.add({
-					severity: "warning",
-					summary: "Classement requis.",
-					detail : "Sélectionner un classement.",
-					life: 3000
-				});
-				return;
-			}else{
-				ranksInput.push({
-					rank_id : values.rank.id,
-					points : values.rank_points,
-				});
-			}
+		if(isNil(values.rank)){
+			toast.add({
+				severity: "warning",
+				summary: "Classement requis.",
+				detail : "Sélectionner un classement.",
+				life: 3000
+			});
+			return;
 		}else{
 			ranksInput.push({
-				rank_id : initialValues.rank.id,
+				rank_id : values.rank.id,
 				points : values.rank_points,
 			});
 		}
@@ -146,79 +160,47 @@ const onSubmit = async ({ states, values, valid }: FormSubmitEvent) => {
 	}
 
 	let payload = {
-		id: profile.value.id,
-		aft_id: profile.value.aft_id,
-		email: profile.value.email,
-		annual_fee_paid : profile.value.annual_fee,
-		firstname : isEmpty(values.firstname) ? profile.value.firstname : values.firstname,
-		lastname : isEmpty(values.lastname) ?  profile.value.lastname : values.lastname,
-		gender : isEmpty(values.gender) ? profile.value.gender : values.gender.value,
-		birthdate : isEmpty(values.birthdate) ? profile.value.birthdate : formatISO(values.birthdate, { representation: "date" }),
-		phone_number : isEmpty(values.phone_number) ? profile.value.phone_number : values.phone_number,
+		aft_id: values.aft_id,
+		email: values.email,
+		password : values.new_password,
+		annual_fee_paid : false,
+		firstname :  values.firstname,
+		lastname :  values.lastname,
+		gender :  values.gender.value,
+		birthdate :  formatISO(values.birthdate, { representation: "date" }),
+		phone_number : values.phone_number,
 		address: {
-			street : isEmpty(values.street) ? profile.value.address.street : values.street,
-			number : isEmpty(values.number) ? profile.value.address.number : values.firstname,
-			city : isEmpty(values.city) ? profile.value.address.city : values.city,
-			state : isEmpty(values.number) ? profile.value.address.number : values.firstname,
-			zip_code : isEmpty(values.zip_code) ? profile.value.address.zip_code : values.zip_code,
-			country : isEmpty(values.country) ? profile.value.address.country : values.country,
+			street : values.street,
+			number :  values.firstname,
+			city :  values.city,
+			state :  values.firstname,
+			zip_code :  values.zip_code,
+			country :  isNil(values.country) ? "Belgique" : values.country,
 		},
 		member_ranks : ranksInput,
 		categories_ids : states.category.touched ? [values.category.id] : []
 	}
 
-	const result = await memberService.updateProfile(payload);
+	const result = await memberService.createMember(payload);
 
-	console.log("ProfileUpdateForm.onSubmit - response : ");
+	console.log("MemberCreateForm.onSubmit - response : ");
 	console.log(result);
 
 	if(result){
 		toast.add({
 			severity: "success",
-			summary: "Successfully updated profile update.",
+			summary: "Nouveau membre enregistré.",
 			life: 3000
 		});
 
-		await router.push({ name : "home"});
+		await router.push({ name : "member_list"});
 	}
 
 }
 
 onMounted(async () => {
 
-	console.log("MemberUpdateForm.onSubmit - route.params.id : : ", route.params.id);
-	// Get profile info
-	const result = await apiService.get(ApiRoutes.MemberRetrieve + route.params.id);
 
-	console.log("Profile : \n", result);
-	console.log("member_rank0_points : ", result.member_ranks.length > 0 && result.member_ranks[0].points > 0 ? result.member_ranks[0].points : null)
-
-	if (result) {
-		profile.value = result;
-		initialValues.id = result.id;
-		initialValues.aft_id = result.aft_id;
-		initialValues.email = result.email;
-		initialValues.firstname = result.firstname;
-		initialValues.lastname = result.lastname;
-		initialValues.gender = result.gender === "M" ? GenderTypeEnum[0] : GenderTypeEnum[1];
-		initialValues.birthdate = result.birthdate;
-		initialValues.phone_number = result.phone_number;
-		initialValues.rank = result.member_ranks.length > 0 ? result.member_ranks[0].rank : null;
-		initialValues.rank_points = result.member_ranks.length > 0 && result.member_ranks[0].points > 0 ? result.member_ranks[0].points : null;
-		initialValues.category = result.categories.length > 0 ? result.categories[0] : null;
-		initialValues.address_id = result.address.id;
-		initialValues.street = result.address.street;
-		initialValues.number = result.address.number;
-		initialValues.city = result.address.city;
-		initialValues.state = result.address.state;
-		initialValues.zip_code = result.address.zip_code;
-		initialValues.country = result.address.country;
-
-		console.log("ProfileUpdate.onMounted - initialValues : ")
-		console.log( initialValues)
-
-
-	}
 
 	categories.value = await memberService.getCategories();
 
@@ -232,7 +214,6 @@ onMounted(async () => {
 		<ScrollPanel style="width: 100%; height: 400px" class="flex justify-center items-center py-4">
 			<Form
 				v-slot="$form"
-				:initialValues
 				:resolver
 				@submit="onSubmit"
 				class="flex w-1/2 gap-4 m-auto justify-center  items-center bg-amber-100 bg-opacity-50 p-4 rounded"
@@ -280,7 +261,7 @@ onMounted(async () => {
 									<PhCake :size="32" weight="duotone" />
 								</InputGroupAddon>
 								<FloatLabel>
-									<DatePicker id="birthdate" name="birthdate"  dateFormat="dd/mm/yy" />
+									<DatePicker id="birthdate" name="birthdate" dateFormat="dd/mm/yy" />
 									<label for="birthdate">Date de naissance</label>
 								</FloatLabel>
 							</InputGroup>
@@ -294,7 +275,7 @@ onMounted(async () => {
 									<i class="pi pi-at"></i>
 								</InputGroupAddon>
 								<FloatLabel>
-									<InputText id="email" name="email" type="email"/>
+									<InputText id="email" name="email" type="email" />
 									<label for="email">Email</label>
 								</FloatLabel>
 							</InputGroup>
@@ -309,6 +290,33 @@ onMounted(async () => {
 								</FloatLabel>
 							</InputGroup>
 						</div>
+					</Fieldset>
+
+					<Fieldset legend="Mot de passe" class="gap-4">
+						<div class="card grid grid-cols-1 md:grid-cols-2 gap-6 px-4 py-2">
+							<InputGroup>
+								<InputGroupAddon>
+									<PhUserFocus :size="32" weight="duotone" />
+								</InputGroupAddon>
+								<FloatLabel>
+									<Password id="new_password" name="new_password" type="password" />
+									<label for="new_password">Nouveau mot de passe</label>
+								</FloatLabel>
+							</InputGroup>
+
+							<InputGroup>
+								<InputGroupAddon>
+									<PhIdentificationCard :size="32" weight="duotone" />
+								</InputGroupAddon>
+								<FloatLabel>
+									<Password id="confirm_password" name="confirm_password" type="password" />
+									<label for="confirm_password">Confirmer le mot de passe</label>
+								</FloatLabel>
+							</InputGroup>
+
+						</div>
+
+
 					</Fieldset>
 
 					<Fieldset legend="Adresse" class="gap-4">
@@ -386,7 +394,7 @@ onMounted(async () => {
 									<PhIdentificationCard :size="32" weight="duotone" />
 								</InputGroupAddon>
 								<FloatLabel>
-									<InputText id="aft_id" name="aft_id" disabled="true"/>
+									<InputText id="aft_id" name="aft_id"/>
 									<label for="aft_id">AFT ID</label>
 								</FloatLabel>
 							</InputGroup>

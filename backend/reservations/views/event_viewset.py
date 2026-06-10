@@ -25,7 +25,7 @@ class EventViewSet(viewsets.ModelViewSet):
         """
         List all events
         """
-        serializer = self.serializer_class(self.queryset, many=True)
+        serializer = self.serializer_class(self.queryset.all(), many=True)
 
         return Response(serializer.data)
 

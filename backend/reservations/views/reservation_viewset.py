@@ -36,7 +36,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         List all reservations
         """
         serializer = self.serializer_class(
-            self.queryset,
+            self.queryset.all(),
             many=True
         )
 

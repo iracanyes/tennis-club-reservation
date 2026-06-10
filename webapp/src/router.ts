@@ -90,8 +90,17 @@ const routes = [
         }
       },
       {
+        path : AppRoutes.MemberCreate,
+        component: () => import("@pages/MemberFormsView.vue"),
+        name : "member_create",
+        meta: {
+          requiresAuth: true,
+          requiresAdmin: true
+        }
+      },
+      {
         path : AppRoutes.MemberUpdate,
-        component: () => import("@pages/MemberUpdateView.vue"),
+        component: () => import("@pages/MemberFormsView.vue"),
         name : "member_update",
         meta: {
           requiresAuth: true,
@@ -153,6 +162,7 @@ router.beforeEach((to, from) => {
   const token = isNil(tokenString) ? null : JSON.parse(tokenString);
 
   console.log(`router.beforeEach - to.path : ${to.path}`);
+
   if(to.path.startsWith("http")){
     console.log(`router.beforeEach - to.path.startsWith("http") && to.meta.requiresAuth : ${to.path.startsWith("http") && to.meta.requiresAuth}`);
     return true;
@@ -162,7 +172,7 @@ router.beforeEach((to, from) => {
   if(to.meta?.requiresAuth && !isNil(token)) {
     console.log(`router.beforeEach - to.meta.requiresAuth : ${(to.meta.requiresAuth as boolean)}`);
     // Redirect to login allowed
-    if(to.path.includes("login")) return true;
+    if(typeof to.name === "string" && to.name?.includes("login")) return true;
 
     if(token.token.length > 0){
       console.log(`router.beforeEach - !isNil(tokenString) && JSON.parse(tokenString).token.length > 0 : ${!isNil(tokenString) && JSON.parse(tokenString).token.length > 0}`);
@@ -174,16 +184,18 @@ router.beforeEach((to, from) => {
     }else{
       console.log(`router.beforeEach - !(!isNil(tokenString) && JSON.parse(tokenString).token.length > 0) : REDIRECT TO LOGIN`);
 
-      if(to.name?.contains("login")) return true;
-
-      if(to.meta?.requiresAdmin || from.meta?.requiresAdmin){
-        return {name: 'admin-login'};
-      }else {
-        // all pages are restricted, redirect to member login
-        return {name: 'login'};
-      }
 
     }
+  }
+
+  console.log(to, from);
+  if(typeof to.name === "string" && to.name?.includes("login")) return true;
+
+  if(to.meta?.requiresAdmin || from.meta?.requiresAdmin){
+    return { name: 'admin-login' };
+  }else {
+    // all pages are restricted, redirect to member login
+    return {name: 'login'};
   }
 
   return true;

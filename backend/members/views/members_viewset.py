@@ -51,7 +51,7 @@ class MemberViewSet(viewsets.ModelViewSet):
     if not request.user.is_staff:
       self.queryset = self.queryset.filter(is_staff=False)
 
-    serializer = MemberSerializer(self.queryset, many=True)
+    serializer = MemberSerializer(self.queryset.all(), many=True)
 
     return Response(serializer.data)
 

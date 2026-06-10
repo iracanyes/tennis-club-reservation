@@ -10,6 +10,7 @@ const ApiRoutes = {
   CsrfToken : '/auth/csrf_token',
   ChangePassword : '/auth/change_password',
   UpdateProfile : '/api/members/',
+  MemberCreate : '/api/members/',
   MemberList : '/api/members/',
   MemberRetrieve : '/api/members/',
   MemberDelete: '/api/members/',

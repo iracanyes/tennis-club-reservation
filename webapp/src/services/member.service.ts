@@ -85,6 +85,27 @@ class MemberService {
 
   }
 
+  public async createMember(payload : Member){
+    try{
+      const result = await this.apiService.post(ApiRoutes.MemberCreate, payload);
+
+      if(result){
+        return true;
+      }
+    }catch (e) {
+      console.error(e);
+
+      this.toast.add({
+        severity: "danger",
+        summary: "Profile : Erreur",
+        detail: "Erreur lors de la mise à jour du profile",
+        life: 3000
+      });
+    }
+
+    return false;
+  }
+
   public async updateProfile(payload : Member){
     try{
       const result = await this.apiService.put(ApiRoutes.UpdateProfile + payload.id, payload);
@@ -106,9 +127,15 @@ class MemberService {
     return false;
   }
 
-  public async deleteMember(memberId: string){
+  public async deleteMember(member: Member){
+    const payload = {
+      id : member.id,
+      email : member.email,
+      aft_id : member.aft_id,
+    }
+
     try {
-      const result = await this.apiService.delete(ApiRoutes.MemberDelete + memberId);
+      const result = await this.apiService.delete(ApiRoutes.MemberDelete + member.id, payload);
 
       console.log("MembersService.deleteMember result : ",result);
       if(result){
