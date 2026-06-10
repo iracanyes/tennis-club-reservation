@@ -90,7 +90,16 @@ const routes = [
         }
       },
       {
-        path: "/reservations/me",
+        path : AppRoutes.MemberUpdate,
+        component: () => import("@pages/MemberUpdateView.vue"),
+        name : "member_update",
+        meta: {
+          requiresAuth: true,
+          requiresAdmin: true
+        }
+      },
+      {
+        path: AppRoutes.MyReservations,
         component: () => import("@pages/MyReservationsView.vue"),
         name: "my_reservations",
         meta: {
@@ -167,7 +176,7 @@ router.beforeEach((to, from) => {
 
       if(to.name?.contains("login")) return true;
 
-      if(to.meta?.requiresAdmin){
+      if(to.meta?.requiresAdmin || from.meta?.requiresAdmin){
         return {name: 'admin-login'};
       }else {
         // all pages are restricted, redirect to member login

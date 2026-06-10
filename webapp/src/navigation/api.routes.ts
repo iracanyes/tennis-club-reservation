@@ -11,6 +11,7 @@ const ApiRoutes = {
   ChangePassword : '/auth/change_password',
   UpdateProfile : '/api/members/',
   MemberList : '/api/members/',
+  MemberRetrieve : '/api/members/',
   MemberDelete: '/api/members/',
   StripeCheckoutSession : '/api/payment/checkout_session',
   PlanList: '/api/plans',

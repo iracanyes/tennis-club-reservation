@@ -5,11 +5,13 @@ const AppRoutes =  {
   DashboardAdmin : "/admin",
   ProfileChangePassword : "/profile/change_password",
   ProfileUpdate: "/profile/update",
+  MemberUpdate : "/members/update/:id",
   Subscribe : "/subscribe",
   SubscribePaymentSuccess : "/subscribe/payment/success",
   SubscribePaymentCancel : "/subscribe/payment/cancel",
   MyReservations : "/reservations/me",
-  MemberList: "/members/",
+  MemberList: "/members",
+  EventsList: "/events",
 
 }
 

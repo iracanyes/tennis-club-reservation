@@ -19,6 +19,7 @@ import {
 } from "primevue";
 import type {Category, Member, Rank} from "@dto";
 import {MemberService, TokenService} from "@services";
+import AppRoutes from "@navigation/app.routes.ts";
 
 const router = useRouter();
 const tokenService = TokenService.getInstance();
@@ -331,14 +332,16 @@ const resetFilters = () => {
 				<Column header="Action">
 					<template #body="slotProps">
 
-						<div class="flex flex-col gap-y-2">
+						<div class="flex flex-col gap-2 ">
 
 							<Button
 								v-if="tokenService.isAdmin.value"
-								label="Update"
 								icon="pi pi-pen-to-square"
+								as="a"
+								:href="router.resolve({ name: 'member_update', params : { id: slotProps.data.id}}).href"
 								severity="info"
-
+								label="Update"
+								size="small"
 							/>
 
 
@@ -347,7 +350,8 @@ const resetFilters = () => {
 								label="Delete"
 								icon="pi pi-trash"
 								severity="warn"
-								@click.prevent="deleteMember(slotProps.data)"
+								size="small"
+								@click.prevent="deleteMember(slotProps.data.id)"
 							/>
 						</div>
 					</template>
