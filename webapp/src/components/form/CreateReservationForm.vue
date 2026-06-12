@@ -39,9 +39,11 @@ const dateReservation : Ref<Date | null>  = ref(null);
 const start_time : Ref<ReservationStartTimeType| null> = ref(null);
 const start_times = ref(ReservationStartTime);
 const duration = ref(0);
-let durations: number[] = Object.values(ReservationDurationEnum)
+let durations: number[] = Object.values(ReservationDurationEnum).filter(x => x !== ReservationDurationEnum.ONE_DAY);
 const event_type: Ref<ReservationTypeEnumType | null> = ref(ReservationTypeEnum[0]);
 const isDouble = ref(false);
+const isMemberReservation = ref(false);
+const author : Ref<Member|null> = ref(null);
 const participants : Ref<Member[]> = ref([]);
 const loading = ref(false);
 
@@ -146,6 +148,17 @@ const onSubmit = async (e: Event) => {
 		return;
 	}
 
+	if(isMemberReservation.value && isNil(author.value)){
+		toast.add({
+			severity: "error",
+			summary: "Auteur non défini.",
+			detail: "Sélectionner le membre auteur de la réservation." +
+				"\nDouble reservation's duration is between 2 and 4 hours for a double reservation.",
+			life: 3000
+		})
+		return;
+	}
+
 	if(isNil(event_type.value)){
 		toast.add({
 			severity: "error",
@@ -155,11 +168,15 @@ const onSubmit = async (e: Event) => {
 		return;
 	}
 
+	const memberId = tokenService.memberId;
+	console.log("CreateReservationForm.memberId : " + memberId.value);
+
 	const payload = {
 		date_reservation: formatISO(dateReservation.value, { representation: "date"}),
 		start_time: start_time.value.str,
 		duration: duration.value,
 		is_double: isDouble.value,
+		author_id : isMemberReservation.value && !isNil(author.value) ? author.value.id : memberId.value,
 		court_id : courtInput.id,
 		event_type: tokenService.isAdmin.value ? event_type.value.value : "club_reservation",
 		participants_ids: participants.value.map((p) => p.id)
@@ -171,7 +188,7 @@ const onSubmit = async (e: Event) => {
 	try {
 		const data: Reservation = await apiService.post(ApiRoutes.CreateReservation, payload);
 
-		if(data.id){
+		if("id" in data){
 			toast.add({
 				severity: "success",
 				summary: "Reservation created",
@@ -188,7 +205,7 @@ const onSubmit = async (e: Event) => {
 		toast.add({
 			severity: "error",
 			summary: "Reservation could not be created",
-			detail: e.message,
+			detail: e.message.includes("Type error : ") ? null : e.message,
 			life: 3000
 		});
 
@@ -205,7 +222,23 @@ const onSubmit = async (e: Event) => {
 	<div class="">
 		<h3 class="font-semibold mb-2 text-center">Ajouter une réservation</h3>
 		<form class="flex flex-col gap-y-6 mt-4">
-
+			<!-- InputGroup : Is double party -->
+			<InputGroup v-if="tokenService.isAdmin">
+				<InputGroupAddon>
+					<Checkbox v-model="isMemberReservation" :binary="true" size="small" />
+				</InputGroupAddon>
+				<Select
+					id="participants"
+					v-model="author"
+					name="author"
+					:options="members"
+					optionLabel="aft_id"
+					placeholder="Sélectionner l'auteur"
+					filter
+					:maxSelectedLabels="4"
+					:disabled="!isMemberReservation"
+				/>
+			</InputGroup>
 			<!-- InputGroup : Tennis court -->
 			<InputGroup>
 				<InputGroupAddon>

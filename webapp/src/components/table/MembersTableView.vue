@@ -4,7 +4,6 @@ import { useRouter} from "vue-router";
 import {isNil} from "lodash";
 import {
 	Button,
-	ButtonGroup,
 	Checkbox,
 	Column,
 	DataTable,
@@ -19,7 +18,6 @@ import {
 } from "primevue";
 import type {Category, Member, Rank} from "@dto";
 import {MemberService, TokenService} from "@services";
-import AppRoutes from "@navigation/app.routes.ts";
 import {formatISO} from "date-fns";
 
 const router = useRouter();
@@ -100,14 +98,17 @@ const filteredMembers  = computed (() => {
 
 	let memberList = [...members.value];
 
+	// Filter by category
 	if(enableCategoryFilter.value && !isNil(category.value)){
-		memberList = memberList.filter( item => item.categories[0].name === category.value.name);
+		memberList = memberList.filter( item => item.categories[0].name === category.value?.name);
 	}
 
+	// Filter by rank
 	if(enableRankFilter.value && !isNil(rank.value)){
-		memberList = memberList.filter( item => item.member_ranks[0].rank.name === rank.value.name);
+		memberList = memberList.filter( item => item.member_ranks[0].rank.name === rank.value?.name);
 	}
 
+	// Sort by rank
 	if(enableRankSorting.value){
 		memberList = memberList.sort((a, b) => {
 			if(a.member_ranks[0].rank.name === b.member_ranks[0].rank.name) {

@@ -37,6 +37,8 @@ import { GenderTypeEnum } from "@enums/index.ts";
 import type { Category, Rank } from "@dto";
 import { isEmpty, isNil } from "lodash";
 import {formatISO} from "date-fns";
+import { zodResolver } from '@primevue/forms/resolvers/zod';
+import * as z from "zod";
 
 const router = useRouter();
 const toast = useToast();
@@ -44,61 +46,9 @@ const memberService = MemberService.getInstance();
 const genders = ref(GenderTypeEnum);
 const ranks: Ref<Rank[]> = ref([]);
 const categories: Ref<Category[]> = ref([]);
+const resolver = ref();
 
 
-const resolver = ({ values } : any) => {
-	const errors = {
-		aft_id: [],
-		email: [],
-		firstname: [],
-		lastname: [],
-		gender: [],
-		birthdate: [],
-		phone_number: [],
-		category: [],
-		rank: [],
-		street: [],
-		number: [],
-		city: [],
-		state: [],
-		zip_code: [],
-		country: [],
-	};
-
-	console.log(`ProfileUpdateForm.resolvers : ${JSON.stringify(values)}`);
-
-	if(isNil(values.aft_id)){
-		errors.aft_id.push({ message : "AFT ID est requis."});
-	}
-
-	const myAftId = parseInt( values.aft_id );
-	console.log("myAftId : ", myAftId, "\nvalues.aft_id : ", values.aft_id );
-
-	if( myAftId < 1000000 || myAftId > 9999999 ){
-		errors.aft_id.push({ message : "AFT ID doit être compris entre 1000000 et 9999999."});
-	}
-
-	const validEmail = String(values.email)
-		.toLowerCase()
-		.match(
-			/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-		);
-
-	if(isNil(values.email) || !validEmail){
-		errors.email.push({
-			message : "Email is invalid."
-		});
-	}
-
-
-
-	if(isNil(values.aft_id)){
-		errors.aft_id.push({ message : "AFT ID est requis."});
-	}
-
-	return { values, errors };
-
-}
 
 /**
  * Submit method
@@ -107,10 +57,31 @@ const resolver = ({ values } : any) => {
  * @param param0.values
  * @param param0.valid
  */
-const onSubmit = async ({ states, values, valid }: FormSubmitEvent) => {
+const onSubmit = async ({ errors, states, values, valid }: FormSubmitEvent) => {
 	if( valid ){
 		toast.add({  severity: "success", summary: "Mise à jour en cours...", life: 3000});
 	}
+
+	console.log("resolver.errors")
+	console.log(errors);
+	console.log("FormSubmitEvent.values")
+	console.log(values);
+
+	for(let key in errors){
+		for (let error in errors[key]){
+			toast.add({
+				severity: "error",
+				summary: key + " : Error",
+				detail: errors[key][error]["message"],
+				life: 5000
+			})
+		}
+	}
+
+	if(isNil(values)){
+		return;
+	}
+
 
 	if(values.new_password.length === 0 || values.confirm_password.length === 0){
 		toast.add({
@@ -200,23 +171,90 @@ const onSubmit = async ({ states, values, valid }: FormSubmitEvent) => {
 
 onMounted(async () => {
 
-
-
+	// Retrieve all categories
 	categories.value = await memberService.getCategories();
 
+	// Retrieve all ranks
 	ranks.value = await memberService.getRanks();
+
+	// Define validation resolver using zod library
+	resolver.value = zodResolver(
+		z.object({
+			firstname : z.string().min(2, "Prénom requis."),
+			lastname : z.string().min(2, "Nom requis."),
+			gender : z.object({
+				key : z.enum(['MALE', 'FEMALE']),
+				value : z.string().min(1, "La valeur pour le genre doit être 'M' ou 'F'."),
+				text : z.enum(['Mâle', 'Femelle'])
+			}),
+			birthdate : z.date()
+				.min(new Date("1945-01-01"), { error : "Trop âgé."})
+				.max(new Date(new Date().setFullYear(new Date().getFullYear() - 5))),
+			email : z.email({ message : "Entrez un email valide."}).min(2, "Nom requis."),
+			phone_number : z.string().trim().min(2, "N° de téléphone requis."),
+			new_password : z.string().trim().min(5,  "Mot de passe requis."),
+			confirm_password : z.string().trim().min(5,  "Retapez le mot de passe pour validation."),
+			street : z.string().min(3, "Indiquez pour votre adresse la rue."),
+			number : z.string().min(1, "Indiquez pour votre adresse le numéro."),
+			city : z.string().min(2, "Indiquez pour votre adresse la ville."),
+			state : z.string().min(2, "Indiquez pour votre adresse la province."),
+			zip_code : z.string().min(3, "Indiquez pour votre adresse le code postal."),
+			country : z.nullable(z.string().min(3, "Indiquez pour votre adresse la rue.")),
+			aft_id : z.preprocess(
+				(val) => {
+					if (typeof val === "string") {
+						return Number.parseInt(val);
+					}
+					return val;
+				},
+				z.int()
+					.min(1000000, "AFT ID doit être supérieur à 1000000")
+					.max(9999999, "AFT ID doit être inférieur à 9999999")
+			),
+			category : z.strictObject({
+				id : z.uuid(),
+				name : z.enum(Array.from(categories.value, (category) => category.name)),
+				age_min : z.nullable(z.number().min(1, "Âge minimum : 5ans")),
+				age_max : z.nullable(z.number().max(80, "Âge maximum : 80ans")),
+				birth_year_min : z.nullable(z.number().min(1946, "Année de naissance minimale : 5ans")),
+				birth_year_max : z.nullable(z.number().max(new Date().getFullYear() - 5, "Année de naissance minimale : 5ans")),
+				gender : z.enum(Array.from(GenderTypeEnum, (x) => x.value)),
+				description : z.string()
+
+			}),
+			rank : z.strictObject({
+				id : z.uuid(),
+				name: z.enum(Array.from(ranks.value, (rank) => rank.name)),
+			}),
+			rank_points : z.number(),
+
+		})
+			.refine((data) => data.new_password === data.confirm_password, {
+				error: "Mot de passe ne correspondent pas.",
+				path: ["passwordConfirm"]
+			})
+	);
+
 })
 
 </script>
 
 <template>
 	<section class="flex h-full w-full">
-		<ScrollPanel style="width: 100%; height: 400px" class="flex justify-center items-center py-4">
+		<ScrollPanel
+			style="width: 100%; height: 600px"
+			class="flex justify-center items-center py-4"
+			:dt="{
+        bar: {
+            background: 'oklch(41.4%, 0.112, 45.904)'
+        }
+    	}"
+		>
 			<Form
 				v-slot="$form"
 				:resolver
 				@submit="onSubmit"
-				class="flex w-1/2 gap-4 m-auto justify-center  items-center bg-amber-100 bg-opacity-50 p-4 rounded"
+				class="flex w-3/4 gap-4 m-auto justify-center  items-center bg-amber-100 bg-opacity-50 p-4 rounded"
 			>
 				<div class="flex flex-col gap-y-4 justify-center items-center">
 					<Fieldset legend="Informations personnelles" class="gap-4">
@@ -299,7 +337,12 @@ onMounted(async () => {
 									<PhUserFocus :size="32" weight="duotone" />
 								</InputGroupAddon>
 								<FloatLabel>
-									<Password id="new_password" name="new_password" type="password" />
+									<Password
+										id="new_password"
+										name="new_password"
+										type="password"
+										toggleMask
+									/>
 									<label for="new_password">Nouveau mot de passe</label>
 								</FloatLabel>
 							</InputGroup>
@@ -309,7 +352,12 @@ onMounted(async () => {
 									<PhIdentificationCard :size="32" weight="duotone" />
 								</InputGroupAddon>
 								<FloatLabel>
-									<Password id="confirm_password" name="confirm_password" type="password" />
+									<Password
+										id="confirm_password"
+										name="confirm_password"
+										type="password"
+										toggleMask
+									/>
 									<label for="confirm_password">Confirmer le mot de passe</label>
 								</FloatLabel>
 							</InputGroup>
@@ -445,12 +493,10 @@ onMounted(async () => {
 							</InputGroup>
 						</div>
 					</Fieldset>
-					<Fieldset legend="Action" class="w-14 flex p-4">
-						<ButtonGroup class="flex gap-4">
-							<Button type="submit" severity="success" class="w-50">Valider</Button>
-							<Button as="a" href="/home" severity="info" class="text-center">Retour à la page d'accueil</Button>
-						</ButtonGroup>
-					</Fieldset>
+					<ButtonGroup class="h-20 gap-8 p-4 bg-white">
+						<Button  size="small" type="submit" severity="success" class="w-28">Valider</Button>
+						<Button as="a" href="/home" size="small" severity="info" class="w-28">Retour accueil</Button>
+					</ButtonGroup>
 				</div>
 
 			</Form>

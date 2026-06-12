@@ -62,6 +62,9 @@ class MemberService {
     return [];
   }
 
+  /**
+   * Get members
+   */
   public async getMembers(): Promise<Member[]>{
     try{
       const result = await this.apiService.get(ApiRoutes.MemberList);
@@ -85,6 +88,10 @@ class MemberService {
 
   }
 
+  /**
+   * Create member
+   * @param payload
+   */
   public async createMember(payload : Member){
     try{
       const result = await this.apiService.post(ApiRoutes.MemberCreate, payload);
@@ -106,6 +113,10 @@ class MemberService {
     return false;
   }
 
+  /**
+   * Update profile
+   * @param payload
+   */
   public async updateProfile(payload : Member){
     try{
       const result = await this.apiService.put(ApiRoutes.UpdateProfile + payload.id, payload);
@@ -127,6 +138,10 @@ class MemberService {
     return false;
   }
 
+  /**
+   * Delete member
+   * @param member
+   */
   public async deleteMember(member: Member){
     const payload = {
       id : member.id,

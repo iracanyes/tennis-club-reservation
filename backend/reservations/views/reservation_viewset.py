@@ -56,12 +56,13 @@ class ReservationViewSet(viewsets.ModelViewSet):
         if isinstance(request.data, QueryDict):
             request.data._mutable = True
         # Member can only author their reservation
-        # Set authenticated member as reservation's author
-        request.data["author_id"] = str(request.user.id)
         request.data["status"] = Reservation.StatusChoices.ACTIVE
 
         # Member are allowed to create only club reservations
         if not request.user.is_staff :
+            # Set authenticated member as reservation's author
+            request.data["author_id"] = str(request.user.id)
+            # Allowed to create only club reservation
             request.data['event_type'] = Reservation.EventTypeChoices.CLUB_RESERVATION
             request.data["reason"] = Reservation.LockReasonChoices.CLUB_RESERVATION
 
@@ -130,7 +131,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         """
         # We exclude all event created by Admin member
         serializer = self.serializer_class(
-            self.queryset.filter(author=request.user).exclude(event_type=Reservation.EventTypeChoices.EVENT),
+            self.queryset.all().filter(author=request.user).exclude(event_type=Reservation.EventTypeChoices.EVENT),
             many=True
         )
 

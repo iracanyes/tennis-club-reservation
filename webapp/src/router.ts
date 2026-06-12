@@ -116,6 +116,14 @@ const routes = [
         }
       },
       {
+        path: AppRoutes.Reservations,
+        component: () => import("@pages/ReservationsView.vue"),
+        name: "reservations",
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: "/events",
         component: () => import("@pages/EventsView.vue"),
         name: "events",

@@ -1,12 +1,20 @@
 import {computed, reactive, watch, nextTick } from "vue";
 import { isNil } from "lodash";
 import  { type Token } from "@types"
+import {jwtDecode} from "jwt-decode";
 
 class TokenService {
   private static instance: TokenService | null = null;
   private readonly token =  reactive(this.getToken());
   // @ts-ignore
   private readonly tokenSaveHandler = watch(this.token, () => this.handleTokenChange(this.token))
+
+  public readonly memberId = computed(() => {
+
+    console.log("TokenService.token : ", jwtDecode(this.token.token));
+
+    return jwtDecode(this.token.token).user_id;
+  })
 
   public readonly isAdmin = computed(() => {
     console.log("TokenService.isAdmin");

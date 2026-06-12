@@ -9,7 +9,7 @@ const GenderTypeEnum = [
     value: "F",
     text: "Femelle"
   }
-];
+] as const;
 
 type GenderType = {
   key: string;

@@ -36,6 +36,8 @@ import {
 import {GenderTypeEnum} from "@enums/index.ts";
 import type {Category, Rank} from "@dto";
 import {isEmpty, isNil} from "lodash";
+import z from "zod";
+import {zodResolver} from "@primevue/forms/resolvers/zod";
 
 const profile = ref();
 const router = useRouter();
@@ -45,14 +47,14 @@ const memberService = MemberService.getInstance();
 const genders = ref(GenderTypeEnum);
 const ranks: Ref<Rank[]> = ref([]);
 const categories: Ref<Category[]> = ref([]);
-
+const resolver = ref();
 const initialValues = reactive({
 	id: "",
 	aft_id: "",
 	email: "",
 	firstname: "",
 	lastname: "",
-	gender: {},
+	gender: null,
 	birthdate: "",
 	phone_number: "",
 	category: null,
@@ -67,50 +69,40 @@ const initialValues = reactive({
 	country: "",
 });
 
-const resolver = ({ values } : any) => {
-	const errors = {
-		aft_id: [],
-		email: [],
-		firstname: [],
-		lastname: [],
-		gender: [],
-		birthdate: [],
-		phone_number: [],
-		category: [],
-		rank: [],
-		address_id: [],
-		street: [],
-		number: [],
-		city: [],
-		state: [],
-		zip_code: [],
-		country: [],
-	};
 
-	console.log(`ProfileUpdateForm.resolvers : ${JSON.stringify(values)}`);
-
-	if(isNil(values.aft_id)){
-		errors.aft_id.push({ message : "AFT ID est requis."});
-	}
-
-	const myAftId = parseInt( values.aft_id );
-
-	console.log("myAftId : ", myAftId, "\nvalues.aft_id : ", values.aft_id );
-
-	if( myAftId < 1000000 || myAftId > 9999999 ){
-		errors.aft_id.push({ message : "AFT ID doit être compris entre 1000000 et 9999999."});
-	}
-
-	return { values, errors };
-
-}
-
-const onSubmit = async ({ states, values, valid }: FormSubmitEvent) => {
+/**
+ *
+ * @param param0
+ * @param param0.errors
+ * @param param0.states
+ * @param param0.values
+ * @param param0.valid
+ */
+const onSubmit = async ({ errors, states, values, valid }: FormSubmitEvent) => {
 
 	if( valid ){
 		toast.add({  severity: "success", summary: "Mise à jour en cours...", life: 3000});
 	}
 
+	console.log("resolver.errors")
+	console.log(errors);
+	console.log("FormSubmitEvent.values")
+	console.log(values);
+
+	for(let key in errors){
+		for (let error in errors[key]){
+			toast.add({
+				severity: "error",
+				summary: key + " : Error",
+				detail: errors[key][error]["message"],
+				life: 5000
+			})
+		}
+	}
+
+	if(isNil(values)){
+		return;
+	}
 
 	let ranksInput = [];
 	let categoriesInput = profile.value.categories;
@@ -187,6 +179,9 @@ const onSubmit = async ({ states, values, valid }: FormSubmitEvent) => {
 
 }
 
+/**
+ *
+ */
 onMounted(async () => {
 	// Get profile info
 	const result = await apiService.get(ApiRoutes.Me);
@@ -202,7 +197,7 @@ onMounted(async () => {
 		initialValues.firstname = result.firstname;
 		initialValues.lastname = result.lastname;
 		initialValues.gender = result.gender === "M" ? GenderTypeEnum[0] : GenderTypeEnum[1];
-		initialValues.birthdate = result.birthdate;
+		initialValues.birthdate = new Date(result.birthdate).toLocaleDateString();
 		initialValues.phone_number = result.phone_number;
 		initialValues.rank = result.member_ranks.length > 0 ? result.member_ranks[0].rank : null;
 		initialValues.rank_points = result.member_ranks.length > 0 && result.member_ranks[0].points > 0 ? result.member_ranks[0].points : null;
@@ -224,6 +219,81 @@ onMounted(async () => {
 	categories.value = await memberService.getCategories();
 
 	ranks.value = await memberService.getRanks();
+
+	// Define validation resolver using zod library
+	resolver.value = zodResolver(
+		z.object({
+			firstname : z.string().min(2, "Prénom requis.").or(z.literal('')),
+			lastname : z.string().min(2, "Nom requis.").or(z.literal('')),
+			gender : z.nullable(
+				z.object({
+					key : z.enum(['MALE', 'FEMALE']),
+					value : z.string().min(1, "La valeur pour le genre doit être 'M' ou 'F'."),
+					text : z.enum(['Mâle', 'Femelle'])
+				})
+				.or(z.literal(''))
+			),
+			birthdate : z.nullable(
+				z.date()
+					.min(new Date("1945-01-01"), { error : "Trop âgé."})
+					.max(new Date(new Date().setFullYear(new Date().getFullYear() - 5)))
+					.or(z.literal(''))
+			),
+			email : z.email({ message : "Entrez un email valide."})
+				.min(2, "Nom requis.")
+				.or(z.literal('')),
+			phone_number : z.string()
+				.trim()
+				.min(2, "N° de téléphone requis.")
+				.or(z.literal('')),
+			street : z.string()
+				.min(3, "Indiquez pour votre adresse la rue.")
+				.or(z.literal('')),
+			number : z.string()
+				.min(1, "Indiquez pour votre adresse le numéro.")
+				.or(z.literal('')),
+			city : z.string()
+				.min(2, "Indiquez pour votre adresse la ville.")
+				.or(z.literal('')),
+			state : z.string()
+				.min(2, "Indiquez pour votre adresse la province.")
+				.or(z.literal('')),
+			zip_code : z.string()
+				.min(3, "Indiquez pour votre adresse le code postal.")
+				.or(z.literal('')),
+			country : z.string()
+				.min(3, "Indiquez pour votre adresse la rue.")
+				.or(z.literal('')),
+			aft_id : z.preprocess(
+				(val) => {
+					if (typeof val === "string") {
+						return Number.parseInt(val);
+					}
+					return val;
+				},
+				z.int()
+					.min(1000000, "AFT ID doit être supérieur à 1000000")
+					.max(9999999, "AFT ID doit être inférieur à 9999999")
+			).or(z.literal('')),
+			category : z.nullable(z.strictObject({
+				id : z.uuid(),
+				name : z.enum(Array.from(categories.value, (category) => category.name)),
+				age_min : z.nullable(z.number().min(1, "Âge minimum : 5ans")),
+				age_max : z.nullable(z.number().max(80, "Âge maximum : 80ans")),
+				birth_year_min : z.nullable(z.number().min(1946, "Année de naissance minimale : 5ans")),
+				birth_year_max : z.nullable(z.number().max(new Date().getFullYear() - 5, "Année de naissance minimale : 5ans")),
+				gender : z.enum(Array.from(GenderTypeEnum, (x) => x.value)),
+				description : z.string()
+
+			})),
+			rank : z.nullable(z.strictObject({
+				id : z.uuid(),
+				name: z.enum(Array.from(ranks.value, (rank) => rank.name)),
+			})),
+			rank_points : z.number(),
+
+		})
+	);
 })
 
 </script>
@@ -281,7 +351,12 @@ onMounted(async () => {
 									<PhCake :size="32" weight="duotone" />
 								</InputGroupAddon>
 								<FloatLabel>
-									<DatePicker id="birthdate" name="birthdate"  dateFormat="dd/mm/yy" />
+									<DatePicker
+										id="birthdate"
+										name="birthdate"
+										view="date"
+										dateFormat="dd/mm/yy"
+									/>
 									<label for="birthdate">Date de naissance</label>
 								</FloatLabel>
 							</InputGroup>

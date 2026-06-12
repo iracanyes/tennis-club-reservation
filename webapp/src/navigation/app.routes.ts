@@ -11,6 +11,7 @@ const AppRoutes =  {
   SubscribePaymentSuccess : "/subscribe/payment/success",
   SubscribePaymentCancel : "/subscribe/payment/cancel",
   MyReservations : "/reservations/me",
+  Reservations : "/reservations",
   MemberList: "/members",
   EventsList: "/events",
 

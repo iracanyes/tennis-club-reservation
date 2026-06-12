@@ -10,6 +10,10 @@ class Category(models.Model):
       models.UniqueConstraint(fields=['name'], name='unique_name'),
     ]
 
+  class GenderChoices(models.TextChoices):
+    MALE = "M",
+    FEMALE = "F"
+
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   name = models.CharField(max_length=50)
   description = models.TextField()
@@ -17,7 +21,7 @@ class Category(models.Model):
   age_max = models.IntegerField(name='age_max', null=True)
   birth_year_min = models.IntegerField(name='birth_year_min', null=True)
   birth_year_max = models.IntegerField(name='birth_year_max', null=True)
-  gender = models.CharField(max_length=1)
+  gender = models.CharField(max_length=1, choices=GenderChoices, default=GenderChoices.MALE)
 
   parentCategory = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subCategories')
 

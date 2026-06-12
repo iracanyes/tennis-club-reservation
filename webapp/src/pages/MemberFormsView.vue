@@ -34,7 +34,7 @@ onMounted(() => {
 
 				<!-- member's reservations list  -->
 				<div class="card flex">
-					<MemberUpdateForm v-if="route.path === AppRoutes.MemberUpdate" :id="route.params.id" />
+					<MemberUpdateForm v-if="route.name === 'member_update'" :id="route.params.id" />
 					<MemberCreateForm v-if="route.path === AppRoutes.MemberCreate" />
 				</div>
 
