@@ -1,11 +1,11 @@
-import APIService from "@services/api.service.ts";
+import ApiService from "@services/api.service.ts";
 import {isNil} from "lodash";
 import ApiRoutes from "@navigation/api.routes.ts";
 import { useToast } from "primevue";
 import type {Category, Member, Rank} from "@dto";
 
 class MemberService {
-  private readonly apiService: APIService  = APIService.getInstance();
+  private readonly apiService: ApiService  = ApiService.getInstance();
   private static instance: MemberService;
   private readonly toast = useToast();
 
@@ -158,6 +158,38 @@ class MemberService {
       }
     }catch (e: any) {
       console.error("MembersService.deleteMember() errors : ",e);
+      this.toast.add({
+        severity: "danger",
+        summary: "Profile : Erreur",
+        detail : e.message
+      });
+    }
+
+    return false;
+  }
+
+  public async toggleSubscriptionStatus(member: Member){
+    const payload = {
+      id: member.id,
+      aft_id: member.aft_id,
+      email : member.email,
+      annual_fee_paid : !member.annual_fee_paid,
+    }
+
+    try{
+      const response = await this.apiService.put(ApiRoutes.SubscriptionStatus, payload);
+
+      if(response){
+        return true;
+      }
+    }catch (e: any) {
+      this.toast.add({
+        severity: "danger",
+        summary: "Profile : Erreur",
+        detail : e.message,
+        life : 3000
+      });
+
     }
 
     return false;

@@ -2,20 +2,23 @@
 import {ref, onMounted, type Ref} from "vue";
 import {Column, DataTable, Tag, useToast} from "primevue";
 import ApiRoutes from "@navigation/api.routes.ts";
-import { APIService } from "@services";
+import { ApiService } from "@services";
 import type Reservation from "@dto/reservation.dto.ts";
+import {ReservationHelper} from "@helper";
 
-const apiService = APIService.getInstance();
+const apiService = ApiService.getInstance();
 const reservations: Ref<Reservation[]> = ref([]);
 const expandedRowGroups = ref();
 const toast = useToast();
 
 const onRowGroupExpand = (event: any) => {
-	toast.add({ severity: 'info', summary: 'Row Group Expanded', detail: 'Value: ' + event.data, life: 3000 });
+	//toast.add({ severity: 'info', summary: 'Row Group Expanded', detail: 'Value: ' + event.data, life: 3000 });
 };
 const onRowGroupCollapse = (event: any) => {
-	toast.add({ severity: 'success', summary: 'Row Group Collapsed', detail: 'Value: ' + event.data, life: 3000 });
+	//toast.add({ severity: 'success', summary: 'Row Group Collapsed', detail: 'Value: ' + event.data, life: 3000 });
 };
+
+
 
 const getSeverity = (reservation: Reservation) => {
 	console.log("MyReservationTableView.getSeverity - ",reservation);
@@ -84,7 +87,7 @@ onMounted(async () => {
 			<template #groupheader="slotProps">
 				<img :alt="slotProps.data.court.number" :src="''" width="32" style="vertical-align: middle; display: inline-block" class="ml-2" />
 				<span class="align-middle ml-2 font-bold leading-normal">
-					{{ `Terrain n° ${slotProps.data.court.number} : ${slotProps.data.court.type}` }}
+					{{ `Terrain n° ${slotProps.data.court.number} : ${ReservationHelper.displayCourtType(slotProps.data.court.type)}` }}
 				</span>
 			</template>
 			<Column field="date_reservation" header="Date réservation" style="width: 25%"></Column>
@@ -113,5 +116,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
+div.p-datatable{
+	font-size: 12px;
+}
 </style>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, type Ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { onMounted, ref, type Ref } from "vue";
+import { useRouter } from "vue-router";
 import { Form, type FormSubmitEvent } from "@primevue/forms";
 import {
 	Button,
@@ -35,10 +35,10 @@ import {
 } from "@phosphor-icons/vue";
 import { GenderTypeEnum } from "@enums/index.ts";
 import type { Category, Rank } from "@dto";
-import { isEmpty, isNil } from "lodash";
+import { isNil } from "lodash";
 import {formatISO} from "date-fns";
 import { zodResolver } from '@primevue/forms/resolvers/zod';
-import * as z from "zod";
+import { z } from "@config/zod.i18n.ts";
 
 const router = useRouter();
 const toast = useToast();
@@ -81,7 +81,6 @@ const onSubmit = async ({ errors, states, values, valid }: FormSubmitEvent) => {
 	if(isNil(values)){
 		return;
 	}
-
 
 	if(values.new_password.length === 0 || values.confirm_password.length === 0){
 		toast.add({
@@ -142,9 +141,9 @@ const onSubmit = async ({ errors, states, values, valid }: FormSubmitEvent) => {
 		phone_number : values.phone_number,
 		address: {
 			street : values.street,
-			number :  values.firstname,
+			number :  values.number,
 			city :  values.city,
-			state :  values.firstname,
+			state :  values.state,
 			zip_code :  values.zip_code,
 			country :  isNil(values.country) ? "Belgique" : values.country,
 		},

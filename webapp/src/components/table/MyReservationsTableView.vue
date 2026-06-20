@@ -2,14 +2,16 @@
 import { ref, onMounted } from "vue";
 import { useRouter} from "vue-router";
 import type Reservation from "@dto/reservation.dto.ts";
-import ApiService from "@services/api.service.ts";
+import { ApiService, TokenService } from "@services";
 import ApiRoutes from "@navigation/api.routes.ts";
 import {isNil} from "lodash";
 import { DataTable, Column, Tag, Button, ButtonGroup } from "primevue";
+import { ReservationHelper } from "@helper";
 
 const router = useRouter();
 const myReservations = ref<Reservation[]>([]);
 const apiService = ApiService.getInstance();
+const tokenService = TokenService.getInstance();
 let tomorrow = new Date();
 
 
@@ -52,6 +54,7 @@ const getSeverity = (reservation: Reservation) => {
 	}
 };
 
+
 const deleteReservation = async (reservation: Reservation) => {
 	console.log()
 	try {
@@ -79,20 +82,40 @@ const deleteReservation = async (reservation: Reservation) => {
 			:rowsPerPageOptions="[5, 10, 20, 50]"
 			tableStyle="min-width: 50rem"
 		>
-			<Column field="date_reservation" header="Date réservation" style="width: 25%"></Column>
-			<Column field="start_time" header="Heure de début" style="width: 25%"></Column>
-			<Column field="duration" header="Durée" style="width: 25%">
+			<Column field="date_reservation" header="Date réservation" style="width: 7rem"></Column>
+			<Column field="start_time" header="Heure de début" style="width: 3.5rem"></Column>
+			<Column field="duration" header="Durée" style="width: 3rem">
 				<template #body="slotProps">
 					{{ slotProps.data.duration + "h"}}
 				</template>
 			</Column>
-			<Column field="is_double" header="En double?" style="width: 25%">
+			<Column field="is_double" header="En double?" style="width: 3rem">
 				<template #body="slotProps">
 					{{   ( slotProps.data.is_double ? "Oui" : "Non") }}
 				</template>
 			</Column>
-			<Column field="event_type" header="Type d'événement" style="width: 25%"></Column>
-			<Column header="Statut">
+			<Column header="Terrain" style="width: 3.5rem">
+				<template #body="slotProps">
+					{{ "#"+ slotProps.data.court.number + " " + ReservationHelper.displayCourtType(slotProps.data.court.type) }}
+				</template>
+			</Column>
+			<Column header="Participants" style="width: 6.5rem">
+				<template #body="slotProps">
+					<div>
+						<p v-for="participant in slotProps.data.participants" :key="participant.id">
+							<span class="font-semibold">
+								{{participant.aft_id }}
+							</span>
+							<br>
+							<span style="font-size: 11px;">
+								{{ participant.firstname + " " + participant.lastname }}
+							</span>
+
+						</p>
+					</div>
+				</template>
+			</Column>
+			<Column header="Statut" style="width: 6rem">
 				<template #body="slotProps">
 					<Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data)" />
 				</template>
@@ -134,5 +157,16 @@ const deleteReservation = async (reservation: Reservation) => {
 </template>
 
 <style scoped>
+div.p-datatable{
+	font-size: 12px;
+}
+div.p-select-list-container{
+	font-size: 12px;
+}
+
+span.p-select-option-label{
+	font-size: 12px !important;
+}
+
 
 </style>

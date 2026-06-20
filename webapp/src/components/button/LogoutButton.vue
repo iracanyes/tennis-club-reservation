@@ -38,10 +38,11 @@ const logout = async () => {
 		icon="pi pi-sign-out"
 		@click="logout"
 		severity="warn"
-		aria-label="Se déconnecter"
+		aria-label="Quitter"
+		size="small"
 		rounded
 		raised
-		:class="['text-sm', 'p-2', 'border-2', 'rounded-sm']"
+		:class="[cssClasses, 'text-sm', 'p-2', 'border-2', 'rounded-sm']"
 	/>
 </template>
 

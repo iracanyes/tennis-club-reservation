@@ -5,15 +5,20 @@ import {
 import CreateReservationForm from "@components/form/CreateReservationForm.vue";
 import MemberProfileCardsView from "@components/card/MemberProfileCardsView.vue";
 import ReservationsTableView from "@components/table/ReservationsTableView.vue";
+import {TokenService} from "@services";
+
+const tokenService = TokenService.getInstance();
 </script>
 
 <template>
-	<div class="h-full flex flex-col bg-amber-400">
-		<h1 class="text-white text-lg font-semibold text-center p-2">Dashboard : Mes réservations</h1>
+	<div class="h-full w-full flex flex-col bg-amber-400">
+		<h1 class="text-white text-lg font-semibold text-center p-2">
+			Dashboard : Réservations
+		</h1>
 
 
 		<div class="h-full w-full flex flex-row bg-amber-400">
-			<div class="h-full w-3/4 ">
+			<div class="h-full flex-1 ">
 				<!-- User profile cards -->
 				<MemberProfileCardsView />
 
@@ -24,7 +29,7 @@ import ReservationsTableView from "@components/table/ReservationsTableView.vue";
 
 
 			</div>
-			<div class="w-1/4 h-full gap-y-4">
+			<div v-if="tokenService.isAdmin.value" class="w-1/4 h-full gap-y-4">
 				<div class="flex flex-col p-2 gap-y-4">
 					<!-- Card -->
 					<div  class="flex flex-row p-0 justify-between rounded-md border shadow-lg border-emerald-600 bg-emerald-400 ">

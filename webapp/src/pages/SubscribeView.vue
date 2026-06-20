@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {ref, onMounted, type Ref} from "vue";
 import { Card, Button, useToast } from "primevue";
-import {APIService} from "@services";
+import {ApiService} from "@services";
 import ApiRoutes from "@navigation/api.routes.ts";
 import type {Plan} from "../dto";
 const toast = useToast();
-const apiService = APIService.getInstance();
+const apiService = ApiService.getInstance();
 const plans: Ref<Plan[], Plan[]> = ref([]);
 
 onMounted(async () => {
@@ -56,7 +56,7 @@ const buy = async (plan: Plan) => {
 </script>
 
 <template>
-	<main class="h-full bg-amber-500 flex flex-col justify-center items-center">
+	<main class="h-full w-full bg-amber-500 flex flex-col justify-center items-center">
 		<div class="p-2 bg-blue-400 mb-8">
 			<h1 class="text-xl font-semibold text-center">S'abonner</h1>
 			<p class="font-semibold text-black-500">

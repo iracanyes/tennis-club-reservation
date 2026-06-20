@@ -15,3 +15,6 @@ Next, we add some dependencies
 $ npm i vue-router
 $ npm i -D tailwindcss @tailwindcss/vite
 ````
+
+## Internationalization : i18n
+

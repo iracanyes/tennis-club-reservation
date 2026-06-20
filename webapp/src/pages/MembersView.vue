@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import {
-	PhChartLineUp, PhCurrencyEur,
-} from "@phosphor-icons/vue";
-import CreateReservationForm from "@components/form/CreateReservationForm.vue";
 import MemberProfileCardsView from "@components/card/MemberProfileCardsView.vue";
 import MembersTableView from "@components/table/MembersTableView.vue";
 </script>
 
 <template>
-	<div class="h-full flex flex-col bg-amber-400">
+	<div class="h-full w-full flex flex-col bg-amber-400">
 		<h1 class="text-white text-lg font-semibold text-center p-2">Dashboard : Gestion des membres</h1>
 
 

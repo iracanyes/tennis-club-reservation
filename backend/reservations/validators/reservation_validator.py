@@ -3,9 +3,9 @@ from dateutil.relativedelta import relativedelta, SU, SA
 from django.conf import settings
 from datetime import time, datetime, date, timedelta
 
-
+from django.db.models import Model
 from rest_framework import serializers
-from reservations.models import Reservation
+from reservations.models import Reservation, TimeSlot
 
 
 
@@ -36,34 +36,84 @@ class ReservationValidator:
                         raise serializers.ValidationError({'message': 'Reservation end time exceed closing hour 22h.'})
 
         if data["duration"] == Reservation.DurationChoices.ONE_DAY and  data["event_type"] == Reservation.EventTypeChoices.EVENT and data["start_time"] > time(9, 0) :
-            raise serializers.ValidationError("Reservation for one day must start at 09:00 AM.")
+            raise serializers.ValidationError( {"message": "Reservation for one day must start at 09:00 AM."})
 
     @staticmethod
     def check_reservation_already_exists(data):
-        try:
-            if (data['is_double']):
+        reservation_exists = False
 
-                # Check if no reservation for this date and timeslot exists,
-                reservationExists = Reservation.objects.filter(
+        try:
+            if (data['duration'] > 1):
+
+
+
+                # Check if no reservation for this court and date starts in the start time and duration range of the new reservation,
+                reservation_exists = Reservation.objects.filter(
                     date_reservation=data['date_reservation'],
-                    start_time__range=(data['start_time'], (
-                                datetime.combine(date.today(), data['start_time']) + timedelta(
-                            hours=1)).time()),
+                    start_time__range=(
+                        data['start_time'],
+                        (
+                                datetime.combine(date.today(), data['start_time']) + timedelta(hours=data['duration'])
+                        ).time()
+                    ),
                     court__id=data["court"].id
                 ).exists()
+
+                if not reservation_exists :
+                    # Check if no reservation for this court ends in the start_time, duration range of the new reservation
+                    # Here we use TimeSlot which compute the end time of each reservation
+                    reservation_exists = TimeSlot.objects.filter(
+                        date=data['date_reservation'],
+                        court__id=data["court"].id,
+                        end_time__range=(
+                            data['start_time'],
+                            (
+                                    datetime.combine(date.today(), data['start_time']) + timedelta(
+                                hours=data['duration'])
+                            ).time()
+                        )
+                    ).exists()
+
+
+                if not reservation_exists and data["duration"] == Reservation.DurationChoices.TWO_HOURS:
+                    reservation_exists = Reservation.objects.filter(
+                        date_reservation=data['date_reservation'],
+                        court__id=data["court"].id,
+                        duration=Reservation.DurationChoices.FOUR_HOURS,
+                        start_time=(datetime.combine(date.today(), data['start_time']) - timedelta(hours=1)).time()
+                    ).exists()
+
+
+                if not reservation_exists:
+                    # Check if no all day event exists on this court for this date
+                    reservation_exists = Reservation.objects.filter(
+                        date_reservation=data['date_reservation'],
+                        court__id= data["court"].id,
+                        event_type=Reservation.EventTypeChoices.EVENT,
+                        duration=Reservation.DurationChoices.ONE_DAY,
+                    ).exists()
+
+
+
             else:
                 # Check if no reservation for this date and timeslot exists,
-                reservationExists = Reservation.objects.filter(
+                reservation_exists = Reservation.objects.filter(
                     date_reservation=data['date_reservation'],
                     start_time=data['start_time']
                 ).exists()
 
-            if reservationExists:
-                raise serializers.ValidationError(
-                    {'message': 'Reservation already exists for this date and time on this court.'})
         except Exception as e:
             ReservationValidator.__logger.error(f"{e}")
-            raise serializers.ValidationError("An error occured while checking if reservation already exists.")
+            raise serializers.ValidationError( {"message": "An error occured while checking if reservation already exists."})
+
+        if settings.DEBUG:
+            ReservationValidator.__logger.warning(f"Reservation start in range exists : {reservation_exists}")
+
+        if reservation_exists :
+            raise serializers.ValidationError(
+                {'message': "Une réservation existe déjà pour ce terrain à l'heure sélectionnée."})
+
+
 
     @staticmethod
     def check_reservation_limit_by_week(data):
@@ -105,4 +155,10 @@ class ReservationValidator:
     @staticmethod
     def check_max_hours_per_reservation(data):
         if data["event_type"] == Reservation.EventTypeChoices.CLUB_RESERVATION and (data["duration"] > Reservation.DurationChoices.FOUR_HOURS):
-            raise serializers.ValidationError("Club reservation has a limit of max 4 hours per reservation.")
+            raise serializers.ValidationError( {"message": "Club reservation has a limit of max 4 hours per reservation."})
+
+
+    @staticmethod
+    def check_annual_fee_paid(data):
+        if not data["author"].annual_fee_paid:
+            raise serializers.ValidationError( {"message": "Reservations not allowed as member hasn't pay his annual fee."})

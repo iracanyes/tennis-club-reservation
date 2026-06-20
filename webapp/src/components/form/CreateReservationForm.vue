@@ -39,7 +39,7 @@ const dateReservation : Ref<Date | null>  = ref(null);
 const start_time : Ref<ReservationStartTimeType| null> = ref(null);
 const start_times = ref(ReservationStartTime);
 const duration = ref(0);
-let durations: number[] = Object.values(ReservationDurationEnum).filter(x => x !== ReservationDurationEnum.ONE_DAY);
+let durations: number[] = Object.values(ReservationDurationEnum).filter(x =>  x < ReservationDurationEnum.ONE_DAY);
 const event_type: Ref<ReservationTypeEnumType | null> = ref(ReservationTypeEnum[0]);
 const isDouble = ref(false);
 const isMemberReservation = ref(false);
@@ -51,12 +51,6 @@ const loading = ref(false);
 onMounted(() => {
 	// Retrieve members
 	loading.value = true;
-
-	// Remove day reservation for member
-	if(!tokenService.isAdmin.value)
-		durations.pop();
-
-
 
 	try{
 		// Get members' list
@@ -188,7 +182,9 @@ const onSubmit = async (e: Event) => {
 	try {
 		const data: Reservation = await apiService.post(ApiRoutes.CreateReservation, payload);
 
-		if("id" in data){
+		console.log("CreateReservation.submit - payload", data);
+
+		if(data && "id" in data){
 			toast.add({
 				severity: "success",
 				summary: "Reservation created",
@@ -223,7 +219,7 @@ const onSubmit = async (e: Event) => {
 		<h3 class="font-semibold mb-2 text-center">Ajouter une réservation</h3>
 		<form class="flex flex-col gap-y-6 mt-4">
 			<!-- InputGroup : Is double party -->
-			<InputGroup v-if="tokenService.isAdmin">
+			<InputGroup v-if="tokenService.isAdmin.value">
 				<InputGroupAddon>
 					<Checkbox v-model="isMemberReservation" :binary="true" size="small" />
 				</InputGroupAddon>
@@ -354,5 +350,7 @@ const onSubmit = async (e: Event) => {
 </template>
 
 <style scoped>
-
+form *{
+	font-size: 12px !important;
+}
 </style>

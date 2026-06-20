@@ -93,7 +93,7 @@ const onSubmit = async (e: Event) => {
 	try {
 		const data: Court = await apiService.post(ApiRoutes.CreateCourt, payload);
 
-		if(data.id){
+		if("id" in data){
 			toast.add({
 				severity: "success",
 				summary: "Court created",

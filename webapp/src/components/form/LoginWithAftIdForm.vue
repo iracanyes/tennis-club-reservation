@@ -2,12 +2,12 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiRoutes from "@navigation/api.routes.ts";
-import {APIService, CSRFService, TokenService} from "@services";
+import {ApiService, CSRFService, TokenService} from "@services";
 
 const aft_id = ref('');
 const password = ref('');
 const router = useRouter();
-const apiService = APIService.getInstance();
+const apiService = ApiService.getInstance();
 const tokenService = TokenService.getInstance();
 const csrfTokenService = CSRFService.getInstance();
 
@@ -29,11 +29,11 @@ const submit = async (e : Event) => {
 
 			console.log(`LoginView - previous route : `, router.options.history.state.back)
 
-			// Redirect to dashboard
+			// Redirect to last page visited or dashboard home
 			if(typeof router.options.history.state.back === "string" ){
-				router.push((router.options.history.state.back as string));
+				await router.push({ path : (router.options.history.state.back as string)});
 			}else{
-				router.push({
+				await router.push({
 					name: 'home',
 				});
 			}

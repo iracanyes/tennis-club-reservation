@@ -171,16 +171,20 @@ router.beforeEach((to, from) => {
 
   console.log(`router.beforeEach - to.path : ${to.path}`);
 
+  // External route accepted
   if(to.path.startsWith("http")){
     console.log(`router.beforeEach - to.path.startsWith("http") && to.meta.requiresAuth : ${to.path.startsWith("http") && to.meta.requiresAuth}`);
     return true;
   }
 
+  // Redirect to login allowed
+  if(typeof to.name === "string" && to.name?.includes("login")) return true;
+
+
   // all routes are private except authentication routes
-  if(to.meta?.requiresAuth && !isNil(token)) {
+  if((to.meta?.requiresAuth || from.meta?.requiresAuth) && !isNil(token)) {
     console.log(`router.beforeEach - to.meta.requiresAuth : ${(to.meta.requiresAuth as boolean)}`);
-    // Redirect to login allowed
-    if(typeof to.name === "string" && to.name?.includes("login")) return true;
+
 
     if(token.token.length > 0){
       console.log(`router.beforeEach - !isNil(tokenString) && JSON.parse(tokenString).token.length > 0 : ${!isNil(tokenString) && JSON.parse(tokenString).token.length > 0}`);
@@ -191,22 +195,25 @@ router.beforeEach((to, from) => {
 
     }else{
       console.log(`router.beforeEach - !(!isNil(tokenString) && JSON.parse(tokenString).token.length > 0) : REDIRECT TO LOGIN`);
+      console.log(to, from);
 
+      if(to.meta?.requiresAdmin || from.meta?.requiresAdmin){
+        return { name: 'admin-login', replace: true };
+      }else {
+        // all pages are restricted, redirect to member login
+        if(to.meta?.requiresAuth || from.meta?.requiresAuth){
+          return {name: 'login', replace: true};
+        }
+
+      }
 
     }
   }
 
-  console.log(to, from);
-  if(typeof to.name === "string" && to.name?.includes("login")) return true;
 
-  if(to.meta?.requiresAdmin || from.meta?.requiresAdmin){
-    return { name: 'admin-login' };
-  }else {
-    // all pages are restricted, redirect to member login
-    return {name: 'login'};
-  }
 
   return true;
+
 
 });
 

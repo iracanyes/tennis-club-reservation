@@ -21,9 +21,9 @@ class Admin(Member):
          'lastname': {self.lastname},
          'gender': {self.gender},
          'birthdate': {self.birthdate},
-         'phoneNumber': {self.phone_number},
+         'phone_number': {self.phone_number},
          'email': {self.email},
-         'annualFeePaid': {self.annual_fee_paid},
+         'annual_fee_paid': {self.annual_fee_paid},
          'address': {self.address},
          'categories': {self.categories},
       }}

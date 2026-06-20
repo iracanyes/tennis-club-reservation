@@ -16,7 +16,7 @@ import {
 	Select,
 	useToast,
 } from "primevue";
-import { APIService, MemberService } from "@services";
+import { ApiService, MemberService } from "@services";
 import ApiRoutes from "@navigation/api.routes.ts";
 import {
 	PhCake,
@@ -43,7 +43,7 @@ import {zodResolver} from "@primevue/forms/resolvers/zod";
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-const apiService = APIService.getInstance();
+const apiService = ApiService.getInstance();
 const memberService = MemberService.getInstance();
 const profile = ref();
 const genders = ref(GenderTypeEnum);
@@ -143,9 +143,9 @@ const onSubmit = async ({ errors, states, values, valid }: FormSubmitEvent) => {
 		phone_number : isEmpty(values.phone_number) ? profile.value.phone_number : values.phone_number,
 		address: {
 			street : isEmpty(values.street) ? profile.value.address.street : values.street,
-			number : isEmpty(values.number) ? profile.value.address.number : values.firstname,
+			number : isEmpty(values.number) ? profile.value.address.number : values.number,
 			city : isEmpty(values.city) ? profile.value.address.city : values.city,
-			state : isEmpty(values.number) ? profile.value.address.number : values.firstname,
+			state : isEmpty(values.state) ? profile.value.address.state : values.state,
 			zip_code : isEmpty(values.zip_code) ? profile.value.address.zip_code : values.zip_code,
 			country : isEmpty(values.country) ? profile.value.address.country : values.country,
 		},
@@ -179,7 +179,7 @@ onMounted(async () => {
 	console.log("Profile : \n", result);
 	console.log("member_rank0_points : ", result.member_ranks.length > 0 && result.member_ranks[0].points > 0 ? result.member_ranks[0].points : null)
 
-	if (result) {
+	if ("id" in result) {
 		profile.value = result;
 		initialValues.id = result.id;
 		initialValues.aft_id = result.aft_id;

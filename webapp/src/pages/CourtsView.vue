@@ -15,7 +15,7 @@ import CreateCourtForm from "@components/form/CreateCourtForm.vue";
 </script>
 
 <template>
-	<div class="h-full flex flex-col bg-amber-400">
+	<div class="h-full w-full flex flex-col bg-amber-400">
 		<h1 class="text-white text-lg font-semibold text-center p-2">Dashboard : Terrains</h1>
 
 

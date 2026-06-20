@@ -16,7 +16,7 @@ import {
 	Select,
 	useToast,
 } from "primevue";
-import {APIService, MemberService} from "@services";
+import {ApiService, MemberService} from "@services";
 import ApiRoutes from "@navigation/api.routes.ts";
 import {
 	PhCake,
@@ -36,13 +36,14 @@ import {
 import {GenderTypeEnum} from "@enums/index.ts";
 import type {Category, Rank} from "@dto";
 import {isEmpty, isNil} from "lodash";
-import z from "zod";
+import { z } from "@config/zod.i18n.ts";
 import {zodResolver} from "@primevue/forms/resolvers/zod";
+import { formatISO } from "date-fns";
 
 const profile = ref();
 const router = useRouter();
 const toast = useToast();
-const apiService = APIService.getInstance();
+const apiService = ApiService.getInstance();
 const memberService = MemberService.getInstance();
 const genders = ref(GenderTypeEnum);
 const ranks: Ref<Rank[]> = ref([]);
@@ -152,9 +153,9 @@ const onSubmit = async ({ errors, states, values, valid }: FormSubmitEvent) => {
 		phone_number : isEmpty(values.phone_number) ? profile.value.phone_number : values.phone_number,
 		address: {
 			street : isEmpty(values.street) ? profile.value.address.street : values.street,
-			number : isEmpty(values.number) ? profile.value.address.number : values.firstname,
+			number : isEmpty(values.number) ? profile.value.address.number : values.number,
 			city : isEmpty(values.city) ? profile.value.address.city : values.city,
-			state : isEmpty(values.number) ? profile.value.address.number : values.firstname,
+			state : isEmpty(values.state) ? profile.value.address.state : values.state,
 			zip_code : isEmpty(values.zip_code) ? profile.value.address.zip_code : values.zip_code,
 			country : isEmpty(values.country) ? profile.value.address.country : values.country,
 		},
@@ -189,7 +190,7 @@ onMounted(async () => {
 	console.log("Profile : \n", result);
 	console.log("member_rank0_points : ", result.member_ranks.length > 0 && result.member_ranks[0].points > 0 ? result.member_ranks[0].points : null)
 
-	if (result) {
+	if ("id" in result) {
 		profile.value = result;
 		initialValues.id = result.id;
 		initialValues.aft_id = result.aft_id;
@@ -290,7 +291,7 @@ onMounted(async () => {
 				id : z.uuid(),
 				name: z.enum(Array.from(ranks.value, (rank) => rank.name)),
 			})),
-			rank_points : z.number(),
+			rank_points : z.nullable(z.number()),
 
 		})
 	);
@@ -300,7 +301,7 @@ onMounted(async () => {
 
 <template>
 	<section class="flex h-full w-full">
-		<ScrollPanel style="width: 100%; height: 400px" class="flex justify-center items-center py-4">
+		<ScrollPanel style="width: 100%; height: 600px" class="flex justify-center items-center py-4">
 			<Form
 				v-slot="$form"
 				:initialValues
@@ -354,7 +355,6 @@ onMounted(async () => {
 									<DatePicker
 										id="birthdate"
 										name="birthdate"
-										view="date"
 										dateFormat="dd/mm/yy"
 									/>
 									<label for="birthdate">Date de naissance</label>

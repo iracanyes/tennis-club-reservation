@@ -2,12 +2,12 @@ from django.db.models import Model
 from django.http import QueryDict
 from pip._internal.utils import logging
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from members.serializers import MemberSerializer, MemberDeleteSerializer, MemberWithoutPasswordSerializer
+from members.serializers import MemberSerializer, MemberDeleteSerializer, MemberWithoutPasswordSerializer, MemberSubscriptionStatusSerializer
 from members.models import Member, Address, Category, MemberRank, Rank
 from tcr_auth.permissions import IsOwnerOrReadonly
 
@@ -127,3 +127,21 @@ class MemberViewSet(viewsets.ModelViewSet):
 
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+  @action(methods=["PUT"], detail=False)
+  def subscription_status(self, request):
+    self.__logger.warning(f"\nMemberViewSet.subscription_status - request : {request.data} \n")
+    self.__logger.warning(f"\nMemberViewSet.subscription_status - user : {request.user} \n")
+
+
+    if not request.user.is_staff :
+      raise PermissionDenied("Only staff can confirm members' subscriptions.")
+
+    serializer = MemberSubscriptionStatusSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    member = serializer.validated_data["member"]
+    member.annual_fee_paid = serializer.validated_data["annual_fee_paid"]
+
+    member.save()
+
+    return Response(status=status.HTTP_204_NO_CONTENT)

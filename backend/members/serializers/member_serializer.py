@@ -223,3 +223,27 @@ class MemberReservationSerializer(MemberSerializer):
     class Meta:
         model = Member
         fields = ["aft_id", "email", "firstname", "lastname", "gender", "birthdate", "member_ranks", "categories"]
+
+class MemberSubscriptionStatusSerializer(serializers.Serializer):
+    __logger = logging.getLogger(__name__)
+    id = serializers.UUIDField()
+    aft_id = serializers.IntegerField()
+    email = serializers.EmailField()
+    annual_fee_paid = serializers.BooleanField()
+
+    def validate(self, data):
+        if settings.DEBUG :
+            self.__logger.warning(f"MemberSubscriptionStatusSerializer.validate - data : {data}")
+
+        member = Member.objects.filter(id=data['id'], aft_id=data['aft_id'], email=data['email']).get()
+
+        if settings.DEBUG:
+            self.__logger.warning(f"MemberDeleteSerializer.validate - member : {member}")
+
+        if member is None:
+            raise serializers.ValidationError("ID, AFT ID, or email  is incorrect.")
+
+        data["member"] = member
+
+        return data
+

@@ -2,13 +2,13 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiRoutes from "@navigation/api.routes.ts";
-import { APIService } from "@services";
+import { ApiService } from "@services";
 
 const password = ref('');
 const newPassword = ref('');
 const confirmNewPassword = ref('');
 const router = useRouter();
-const apiService = APIService.getInstance();
+const apiService = ApiService.getInstance();
 const hasError = ref(false);
 const error = ref('')
 

@@ -6,6 +6,7 @@ import ApiService from "@services/api.service.ts";
 import ApiRoutes from "@navigation/api.routes.ts";
 import {isNil} from "lodash";
 import { DataTable, Column, Tag, Button, ButtonGroup } from "primevue";
+import {ReservationHelper} from "@helper";
 
 const router = useRouter();
 const events = ref<Reservation[]>([]);
@@ -86,7 +87,7 @@ const deleteReservation = async (reservation: Reservation) => {
 			<Column field="reason" header="Raison" style="width: 25%"></Column>
 			<Column field="court.number" header="Court" style="width: 25%">
 				<template #body="slotProps">
-					{{ slotProps.data.court.number + " [" + slotProps.data.court.type + "]"  }}
+					{{ "#" + slotProps.data.court.number + " " + ReservationHelper.displayCourtType(slotProps.data.court.type)   }}
 				</template>
 			</Column>
 			<Column header="Statut">
@@ -131,5 +132,7 @@ const deleteReservation = async (reservation: Reservation) => {
 </template>
 
 <style scoped>
-
+div.p-datatable{
+	font-size: 12px;
+}
 </style>

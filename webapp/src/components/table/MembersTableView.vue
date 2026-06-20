@@ -3,6 +3,7 @@ import {ref, onMounted, type Ref, computed} from "vue";
 import { useRouter} from "vue-router";
 import {isNil} from "lodash";
 import {
+	useToast,
 	Button,
 	Checkbox,
 	Column,
@@ -21,6 +22,7 @@ import {MemberService, TokenService} from "@services";
 import {formatISO} from "date-fns";
 
 const router = useRouter();
+const toast = useToast();
 const tokenService = TokenService.getInstance();
 const memberService = MemberService.getInstance();
 const members = ref<Member[]>([]);
@@ -67,7 +69,6 @@ const getSeverity = (member: Member) => {
 	}else{
 		return 'warn';
 	}
-	return 'secondary';
 };
 
 /**
@@ -85,6 +86,25 @@ const deleteMember = async (member: Member) => {
 		}
 	}catch (e: any) {
 		console.error("MembersView.deleteMember errors : ",e);
+	}
+}
+
+const toggleMemberSubscriptionStatus = async (member: Member) => {
+	try{
+		const result = await memberService.toggleSubscriptionStatus(member);
+
+		if(result){
+			toast.add({
+				severity: "success",
+				summary: "Subscription status update : Success",
+				detail: "Subscription's status updated!",
+				life : 3000
+			});
+
+			router.go(0);
+		}
+	}catch (e) {
+		console.error(e);
 	}
 }
 
@@ -134,7 +154,9 @@ const filteredMembers  = computed (() => {
 	return memberList;
 });
 
-
+/**
+ * Reset all filter or sort in place
+ */
 const resetFilters = () => {
 	enableCategoryFilter.value = false;
 	enableRankFilter.value = false;
@@ -148,6 +170,7 @@ const resetFilters = () => {
 
 <template>
 	<section id="ownReservationsTable" class="flex flex-col h-full justify-center items-center w-full mx-auto">
+		<!-- Filtres -->
 		<section id="filtres" class="m-4">
 			<div class="flex flex-row gap-x-4">
 				<div class="flex flex-col gap-y-4">
@@ -241,14 +264,14 @@ const resetFilters = () => {
 				</div>
 			</div>
 		</section>
-		<ScrollPanel style="min-width: 790px;width: 1080px;height: 500px">
+		<ScrollPanel style="min-width: 790px;width: 80rem;height: 500px">
 			<DataTable
 				:value="filteredMembers"
 				size="small"
 				paginator
 				:rows="5"
 				:rowsPerPageOptions="[5, 10, 20, 50]"
-				tableStyle="min-width: 30rem; font-size: small;max-width: 650px;margin: 0 auto"
+				tableStyle="min-width: 30rem; font-size: small;max-width: 80rem;margin: 0 auto;padding: 2px"
 			>
 				<Column
 					field="aft_id"
@@ -312,7 +335,7 @@ const resetFilters = () => {
 						</span>
 					</template>
 				</Column>
-				<Column header="En ordre de côtisation">
+				<Column header="En ordre de côtisation" v-if="tokenService.isAdmin.value">
 					<template #body="slotProps">
 						<Tag :value="slotProps.data.annual_fee_paid" :severity="getSeverity(slotProps.data)" />
 					</template>
@@ -326,7 +349,7 @@ const resetFilters = () => {
 						+ slotProps.data.address.zip_code + " " + slotProps.data.address.country ) }}
 					</template>
 				</Column>
-				<Column header="Action">
+				<Column header="Action" v-if="tokenService.isAdmin.value">
 					<template #body="slotProps">
 
 						<div class="flex flex-col gap-2 ">
@@ -337,18 +360,25 @@ const resetFilters = () => {
 								as="a"
 								:href="router.resolve({ name: 'member_update', params : { id: slotProps.data.id}}).href"
 								severity="info"
-								label="Update"
+								label="Éditer"
 								size="small"
 							/>
 
-
 							<Button
 								v-if="tokenService.isAdmin.value"
-								label="Delete"
+								label="Supprimer"
 								icon="pi pi-trash"
-								severity="warn"
+								severity="danger"
 								size="small"
 								@click="deleteMember(slotProps.data)"
+							/>
+							<Button
+								v-if="tokenService.isAdmin.value"
+								label="Changer le statut d'abonnement"
+								:icon="slotProps.data.annual_fee_paid ? 'pi pi-times' : 'pi pi-check'"
+								:severity="slotProps.data.annual_fee_paid ? 'warn' : 'info'"
+								size="small"
+								@click="toggleMemberSubscriptionStatus(slotProps.data)"
 							/>
 						</div>
 					</template>
@@ -373,5 +403,8 @@ const resetFilters = () => {
 <style scoped>
 table{
 	width: 30rem;
+}
+div.p-datatable{
+	font-size: 12px;
 }
 </style>

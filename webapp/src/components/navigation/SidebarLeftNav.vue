@@ -35,24 +35,24 @@ const items = ref([
 			}
 		]
 	},
-	{
-		label: 'Événements',
-		icon: 'pi pi-calendar-clock',
-		// utilisation du table spread pour ajouter les éléments à afficher seulement pour les administrateurs
-		items: [
-			...(tokenService.isAdmin.value ?
-				[
-					{
-						label: 'Gestion des événements',
-						icon: 'pi pi-trophy',
-						badge: 6,
-						route: "/events",
-					}
-				]
-				: []
-			)
-		]
-	},
+	...(tokenService.isAdmin.value ?
+			[
+				{
+					label: 'Événements',
+					icon: 'pi pi-calendar-clock',
+					// utilisation du table spread pour ajouter les éléments à afficher seulement pour les administrateurs
+					items: [
+						{
+							label: 'Gestion des événements',
+							icon: 'pi pi-trophy',
+							badge: 6,
+							route: "/events",
+						}
+					]
+				}
+			]
+			: []
+	),
 	{
 		label: 'Terrains',
 		icon: 'pi pi-objects-column',
@@ -151,7 +151,9 @@ const items = ref([
 	<div class="h-full flex flex-col">
 		<div id="logo" class="h-14 w-full flex flex-row bg-lime-500 p-2 mb-4">
 			<img src="/src/assets/img/tsc_logo.png" alt="TCR - Réservations" class="w-10 rounded-sm mr-2"/>
-			<p class="h-8 mt-2 flex text-md font-semibold text-white-100 text-center align-middle">TCR - Réservations</p>
+			<div class="h-8 mt-2 flex flex-col text-base font-semibold text-white-100 text-center align-middle">
+				<div class="text-sm">TCR Réservations</div>
+			</div>
 		</div>
 		<div id="sidebar-left-menu" class="h-full card flex-1 justify-content-center bg-lime-500">
 			<PanelMenu :model="items" class="w-full md:w-20rem bg-lime-500">

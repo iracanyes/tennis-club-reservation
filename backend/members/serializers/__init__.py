@@ -1,7 +1,7 @@
 from .rank_serializer import RankSerializer
 from .member_rank_serializer import MemberRankSerializer
 from .address_serializer import AddressSerializer
-from .member_serializer import MemberSerializer, MemberLoginSerializer, MemberWithoutPasswordSerializer, MemberDeleteSerializer, MemberReservationSerializer
+from .member_serializer import MemberSerializer, MemberLoginSerializer, MemberWithoutPasswordSerializer, MemberDeleteSerializer, MemberReservationSerializer, MemberSubscriptionStatusSerializer
 
 # CategorySerializer must be defined after MemberSerializer
 from .category_serializer import CategorySerializer

@@ -42,10 +42,10 @@ class Member(AbstractUser):
   lastname = models.CharField(max_length=50)
   gender = models.CharField(max_length=1)
   birthdate = models.DateField()
-  phoneNumber = models.CharField(name='phone_number', max_length=20)
+  phone_number = models.CharField(name='phone_number', max_length=20)
   email = models.EmailField(unique=True)
   password = models.CharField(max_length=255)
-  annualFeePaid = models.BooleanField(name='annual_fee_paid', default=False)
+  annual_fee_paid = models.BooleanField(name='annual_fee_paid', default=False)
   userType = 'member'
 
   date_joined = models.DateTimeField(auto_now_add=True)
@@ -71,7 +71,7 @@ class Member(AbstractUser):
       'birth_date': {self.birthdate},
       'phone_number': {self.phone_number},
       'email': {self.email},
-      'annualFeePaid': {self.annual_fee_paid},
+      'annual_fee_paid': {self.annual_fee_paid},
       'address': {self.address},
       'categories': {self.categories},
       'member_ranks' : {self.member_ranks},

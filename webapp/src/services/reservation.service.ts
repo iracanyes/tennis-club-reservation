@@ -1,11 +1,11 @@
-import { APIService } from "@services";
+import { ApiService } from "@services";
 import {useToast} from "primevue/usetoast";
 import {isNil} from "lodash";
 import type { Reservation } from "@dto";
 import ApiRoutes from "@navigation/api.routes.ts";
 
 class ReservationService {
-  private readonly apiService: APIService = APIService.getInstance();
+  private readonly apiService: ApiService = ApiService.getInstance();
   private static instance: ReservationService;
   private readonly toast = useToast();
 

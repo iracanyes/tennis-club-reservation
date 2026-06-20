@@ -15,6 +15,7 @@ const ApiRoutes = {
   MemberRetrieve : '/api/members/',
   MemberDelete: '/api/members/',
   StripeCheckoutSession : '/api/payment/checkout_session',
+  SubscriptionStatus : '/api/members/subscription_status/',
   PlanList: '/api/plans',
   CourtList: '/api/courts',
   ListCategories : '/api/categories/',

@@ -54,12 +54,6 @@ onMounted(() => {
 	// Retrieve members
 	loading.value = true;
 
-	// Remove day reservation for member
-	if(!tokenService.isAdmin.value)
-		durations.pop();
-
-
-
 	try{
 		// Get members' list
 		apiService.get(ApiRoutes.MemberList)
@@ -176,7 +170,7 @@ const onSubmit = async (e: Event) => {
 	try {
 		const data: Reservation = await apiService.post(ApiRoutes.CreateEvent, payload);
 
-		if(data.id){
+		if("id" in data){
 			toast.add({
 				severity: "success",
 				summary: "Event created",
@@ -220,6 +214,7 @@ const onSubmit = async (e: Event) => {
 						id="event_type"
 						v-model="reason"
 						:options="reasons"
+						size="small"
 						checkmark
 					/>
 					<label for="court" class="text-black">Raison de l'événement</label>
@@ -236,6 +231,7 @@ const onSubmit = async (e: Event) => {
 						v-model="court"
 						:options="courts"
 						optionLabel="number"
+						size="small"
 						checkmark
 					/>
 					<label for="court" class="text-black">Numéro du court de tennis</label>
@@ -252,6 +248,7 @@ const onSubmit = async (e: Event) => {
 						id="date_reservation"
 						v-model="dateReservation"
 						dateFormat="yy-mm-dd"
+						size="small"
 					/>
 					<label for="date_reservation">Date de réservation</label>
 				</FloatLabel>
@@ -268,6 +265,7 @@ const onSubmit = async (e: Event) => {
 						v-model="start_time"
 						:options="start_times"
 						optionLabel="str"
+						size="small"
 						checkmark
 					/>
 					<label for="court" class="text-black">Heure de début</label>
@@ -285,6 +283,7 @@ const onSubmit = async (e: Event) => {
 						v-model="duration"
 						:options="durations"
 						placeholder="Sélectionner la durée"
+						size="small"
 					/>
 					<label for="court" class="text-black">Sélectionner la durée</label>
 				</FloatLabel>
@@ -340,5 +339,7 @@ const onSubmit = async (e: Event) => {
 </template>
 
 <style scoped>
-
+form *{
+	font-size: 12px !important;
+}
 </style>

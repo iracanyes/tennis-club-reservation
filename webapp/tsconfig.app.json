@@ -31,7 +31,9 @@
       "@dto/*": ["./dto/*"],
       "@enums": ["./enums/index.ts"],
       "@enums/*": ["./enums/*"],
-      "@dto": ["./dto/index.ts"]
+      "@dto": ["./dto/index.ts"],
+      "@config/*" : ["./core/config/*"],
+      "@helper": ["./core/helper/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],

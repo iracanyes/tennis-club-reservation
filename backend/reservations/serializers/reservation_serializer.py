@@ -94,6 +94,8 @@ class ReservationSerializer(serializers.ModelSerializer):
         # 2. Max 4 hours of double reservation by week
         ReservationValidator.check_reservation_limit_by_week(validated_data)
 
+        # Check if member's subscription is paid
+        ReservationValidator.check_annual_fee_paid(validated_data)
 
 
         # event type input

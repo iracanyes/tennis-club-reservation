@@ -6,8 +6,8 @@ import { useToast } from "primevue/usetoast";
 import TokenService from "@services/token.service.ts";
 
 
-class APIService {
-  private static instance: APIService;
+class ApiService {
+  private static instance: ApiService;
   private readonly baseUrl: string = import.meta.env.VITE_API_URL;
   private readonly csrfService: CSRFService = CSRFService.getInstance();
   private readonly cookieService : CookieService = CookieService.getInstance();
@@ -19,10 +19,10 @@ class APIService {
   private constructor() {}
 
   public static getInstance() {
-    if (!APIService.instance) {
-      APIService.instance = new APIService();
+    if (!ApiService.instance) {
+      ApiService.instance = new ApiService();
     }
-    return APIService.instance;
+    return ApiService.instance;
   }
 
   public async post(urlPath: string, payload: any): Promise<any> {
@@ -33,10 +33,10 @@ class APIService {
       throw new Error(`csrf_token is not a valid token`);
     }
 
-    console.log(`APIService.post - csrf_token : ${csrf_token}`);
+    console.log(`ApiService.post - csrf_token : ${csrf_token}`);
 
     let csrfCookie = this.cookieService.getCookie('csrf_token');
-    console.log(`APIService.post - cookie.csrf_token : ${csrfCookie}`);
+    console.log(`ApiService.post - cookie.csrf_token : ${csrfCookie}`);
 
     try{
       const response = await fetch(
@@ -79,7 +79,7 @@ class APIService {
             life: 5000
           });
         }
-        console.log("ApiService.post - response", result);
+        console.error("ApiService.post - response", result);
         throw new Error(`${response.status} : ${response.statusText}`);
       }
 
@@ -140,7 +140,7 @@ class APIService {
         method: 'PUT',
         mode: 'cors',
         cache: 'default',
-        credentials: 'same-origin',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -161,6 +161,10 @@ class APIService {
 
       if(!response.ok){
         throw new Error(`${response.status} : ${response.statusText}`);
+      }
+
+      if(response.status === 204){
+        return true;
       }
 
       return await response.json();
@@ -229,4 +233,4 @@ class APIService {
   }
 }
 
-export default APIService;
+export default ApiService;

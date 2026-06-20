@@ -114,7 +114,7 @@ class StripeService:
                 payment.save()
 
                 # Unlock the member
-                member.annualFeePaid = True
+                member.annual_fee_paid = True
                 member.save()
             except Exception as e:
                 self.__logger.error(f"StripeService.fulfill_checkout failed : \n{e}")

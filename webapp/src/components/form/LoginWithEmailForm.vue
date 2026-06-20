@@ -2,13 +2,13 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiRoutes from "@navigation/api.routes.ts";
-import { APIService, TokenService, CSRFService } from "@services";
-import { useToast } from "primevue";
+import { ApiService, TokenService, CSRFService } from "@services";
+import { useToast, Password } from "primevue";
 
 const email = ref('');
 const password = ref('');
 const router = useRouter();
-const apiService = APIService.getInstance();
+const apiService = ApiService.getInstance();
 const tokenService = TokenService.getInstance();
 const csrfTokenService = CSRFService.getInstance();
 const toast = useToast();
@@ -32,13 +32,13 @@ const submit = async  (e : Event) => {
 			// Set access token
 			await tokenService.setToken(response.data);
 
-			// CSRF Token has been rotated on login. Delete CSRF Token
+			// CSRF Token has been rotated on login.
+			// Delete CSRF Token
 			csrfTokenService.deleteToken();
 
-			// Redirect to dashboard
-			// Redirect to dashboard
+			// Redirect to previous route if exists or go to admin dashboard home
 			if(typeof router.options.history.state.back === "string" ){
-				router.push((router.options.history.state.back as string));
+				await router.push((router.options.history.state.back as string));
 			}else{
 				await router.push({
 					name: 'admin_home',
@@ -144,12 +144,13 @@ const initGoogleSignIn = () => {
 						</div>
 					</div>
 					<div class="mt-2">
-						<input
+						<Password
 							id="password"
 							type="password"
 							name="password"
 							v-model="password"
 							required
+							toggleMask
 							autocomplete="current-password"
 							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" />
 					</div>
